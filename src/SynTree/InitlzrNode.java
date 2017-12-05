@@ -37,7 +37,9 @@ public class InitlzrNode extends SNode {
 
     @Override
     public void checkAndBuild() {
-        expression.setCurrentEnv(currentEnv);
+        if(expression != null) {
+            expression.setCurrentEnv(currentEnv);
+        }
     }
 
     @Override
