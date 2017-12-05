@@ -136,10 +136,12 @@ public class DeclNode extends SNode {
 						symbol.setValue(new double[totalNum]);
 				}
 			}else if (tag == Tag.VARDECL){
+				initlzrNode.getExpression().visit();
 				if (initlzrNode.getExpression() == null)
 					return;
 				symbol.setValue(initlzrNode.getExpression().getValue());
 			}
+
 		}
 
 	}

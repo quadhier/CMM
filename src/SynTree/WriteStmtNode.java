@@ -26,7 +26,7 @@ public class WriteStmtNode extends SNode {
 
     @Override
     public void visit() {
-
+        System.out.println(expression.getValue());
     }
 
 
