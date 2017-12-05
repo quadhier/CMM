@@ -278,6 +278,7 @@ public class NnaryExprNode extends SNode {
 		} else if (tag == Tag.ADTVEXPR || tag == Tag.MLTVEXPR || tag == Tag.UNARYEXPR) { //when is not left value, calculate the value.
 			int i = 0;
 			double d = 0;
+			boolean b = false;
 			if (tag == Tag.UNARYEXPR) {
 				switch (dataType) {
 					case Tag.INT:
@@ -287,6 +288,10 @@ public class NnaryExprNode extends SNode {
 					case Tag.DOUBLE:
 						d = (double) childExpressions.get(0).getValue();
 						value = -d;
+						break;
+					case Tag.BOOL:
+						b = (boolean) childExpressions.get(0).getValue();
+						value = !b;
 						break;
 				}
 			} else if (tag == Tag.ADTVEXPR) {
@@ -342,6 +347,13 @@ public class NnaryExprNode extends SNode {
 									}
 									i /= tmpValue;
 									break;
+								case '%':
+									if (tmpValue == 0) {
+										System.err.println("Runtime Error: mod by 0 on line " + startLine + ", position " + startPos);
+										System.exit(1);
+									}
+									i %= tmpValue;
+									break;
 							}
 						}
 						value = i;
@@ -368,10 +380,77 @@ public class NnaryExprNode extends SNode {
 						break;
 				}
 			}
-			//TODO boolean运算，2==3!=true
 		} else if (tag == Tag.RELAEXPR) {
-			
-		}
+			boolean boolValue = false;
+			int i;
+			double d;
+			switch (childExpressions.get(0).getDataType()){
+				case Tag.INT:
+					i = (int) childExpressions.get(0).getValue();
+					for (int m = 1; m < childExpressions.size(); m++){
+						NnaryExprNode tmp = childExpressions.get(m);
+						int tmpValue = (int) tmp.getValue();
+						switch (tmp.getOpt().getTag()) {
+							case '>':
+								boolValue = i > tmpValue;
+								break;
+							case '<':
+								boolValue = i < tmpValue;
+								break;
+							case Tag.LE:
+								boolValue = i <= tmpValue;
+								break;
+							case Tag.GE:
+								boolValue = i >= tmpValue;
+								break;
+						}
+					}
+					break;
+				case Tag.DOUBLE:
+					d = (double) childExpressions.get(0).getValue();
+					for (int m = 1; m < childExpressions.size(); m++){
+						NnaryExprNode tmp = childExpressions.get(m);
+						double tmpValue = (double) tmp.getValue();
+						switch (tmp.getOpt().getTag()) {
+							case '>':
+								boolValue = d > tmpValue;
+								break;
+							case '<':
+								boolValue = d < tmpValue;
+								break;
+							case Tag.LE:
+								boolValue = d <= tmpValue;
+								break;
+							case Tag.GE:
+								boolValue = d >= tmpValue;
+								break;
+						}
+					}
+					break;
+			}
+			value = boolValue;
+			//TODO RELATIVExpr 部分和assignment-operator，%=，<,<=,!=,+=，boolean运算，2==3!=true
+		} /*else if (tag == Tag.EQEXPR) {
+			boolean boolValue = false;
+			boolValue = (Boolean) childExpressions.get(0).getValue();
+			for (int m = 1; m < childExpressions.size(); m++) {
+				NnaryExprNode tmp = childExpressions.get(m);
+				Boolean tmpValue = (Boolean) tmp.getValue();
+				switch (tmp.getOpt().getTag()) {
+					case '>':
+						boolValue = boolValue > tmpValue;
+						break;
+					case '/':
+						if (tmpValue == 0) {
+							System.err.println("Runtime Error: divided by 0 on line " + startLine + ", position " + startPos);
+							System.exit(1);
+						}
+						d /= tmpValue;
+						break;
+				}
+			}
+			value = boolValue;
+		}*/
 	}
 
 	@Override

@@ -1,5 +1,10 @@
-int a = 3-4*(1+2)/1;
-bool c = 2>3;
+int num = (3-4*(1+2)/1)%2;
+int mod = 3*5%4;
+bool b = !true;
+bool c = 2>3==1;
 int[3][1] d;
-a = (1+2);
-write(a);
+write(num);
+write(mod);
+write(b);
+write(c);
+
