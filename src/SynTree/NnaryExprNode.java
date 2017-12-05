@@ -440,35 +440,50 @@ public class NnaryExprNode extends SNode {
 			// 2==3 == true correct
 			// true != 2==3 incorrect
 
-			switch (childExpressions.get(0).getDataType()) {
-				case Tag.INT:
-					i = (int) childExpressions.get(0).getValue();
-					i1 = (int) childExpressions.get(1).getValue();
-					switch (childExpressions.get(1).getOpt().getTag()) {
-						case Tag.EQ:
-							boolValue = i == i1;
+			for (int m = 0; m < childExpressions.size(); m++) {
+				if (m == 0) {
+					switch (childExpressions.get(0).getDataType()) {
+						case Tag.INT:
+							i = (int) childExpressions.get(0).getValue();
+							i1 = (int) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = i == i1;
+									break;
+								case Tag.NE:
+									boolValue = i != i1;
+									break;
+							}
 							break;
-						case Tag.NE:
-							boolValue = i != i1;
+						case Tag.DOUBLE:
+							d = (double) childExpressions.get(0).getValue();
+							d1 = (double) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = d == d1;
+									break;
+								case Tag.NE:
+									boolValue = d != d1;
+									break;
+							}
+							break;
+						case Tag.BOOL:
+							boolValue = (Boolean) childExpressions.get(0).getValue();
+							bool2 = (Boolean) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = boolValue == bool2;
+									break;
+								case Tag.NE:
+									boolValue = boolValue != bool2;
+									break;
+							}
 							break;
 					}
-					break;
-				case Tag.DOUBLE:
-					d = (double) childExpressions.get(0).getValue();
-					d1 = (double) childExpressions.get(1).getValue();
-					switch (childExpressions.get(1).getOpt().getTag()) {
-						case Tag.EQ:
-							boolValue = d == d1;
-							break;
-						case Tag.NE:
-							boolValue = d != d1;
-							break;
-					}
-					break;
-				case Tag.BOOL:
-					boolValue = (Boolean) childExpressions.get(0).getValue();
-					bool2 = (Boolean) childExpressions.get(1).getValue();
-					switch (childExpressions.get(1).getOpt().getTag()) {
+					m++;
+				} else {
+					bool2 = (Boolean) childExpressions.get(m).getValue();
+					switch (childExpressions.get(m).getOpt().getTag()) {
 						case Tag.EQ:
 							boolValue = boolValue == bool2;
 							break;
@@ -476,19 +491,7 @@ public class NnaryExprNode extends SNode {
 							boolValue = boolValue != bool2;
 							break;
 					}
-					break;
-			}
-			for (int j = 2; j < childExpressions.size(); j++) {
-				bool2 = (Boolean) childExpressions.get(j).getValue();
-				switch (childExpressions.get(j).getOpt().getTag()) {
-					case Tag.EQ:
-						boolValue = boolValue == bool2;
-						break;
-					case Tag.NE:
-						boolValue = boolValue != bool2;
-						break;
 				}
-
 			}
 			value = boolValue;
 		} else if (tag == Tag.LGANDEXPR) {
@@ -507,9 +510,7 @@ public class NnaryExprNode extends SNode {
 				NnaryExprNode tmp = childExpressions.get(m);
 				Boolean tmpValue = (Boolean) tmp.getValue();
 				boolValue = boolValue || tmpValue;
-				break;
 			}
-
 			value = boolValue;
 		}
 	}
