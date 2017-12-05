@@ -1,7 +1,5 @@
 package SynTree;
 
-import CMMVM.Bytecode;
-import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
@@ -74,7 +72,6 @@ public class NnaryExprNode extends SNode {
 		return endPos;
 	}
 
-
 	public void setEndPos(int endPos) {
 		this.endPos = endPos;
 	}
@@ -95,6 +92,7 @@ public class NnaryExprNode extends SNode {
 	public void setConstVal(Token constVal) {
 		this.constVal = constVal;
 	}
+
 
 	@Override
 	public void checkAndBuild() {
@@ -383,7 +381,7 @@ public class NnaryExprNode extends SNode {
 						break;
 				}
 			}
-		} else if (tag == Tag.RELAEXPR) {
+		} else if (tag == Tag.RELAEXPR) { //TODO 如果改了语法，此处就应将循环改为与childExpressions.get(1)比较；
 			boolean boolValue = false;
 			int i;
 			double d;
@@ -432,58 +430,65 @@ public class NnaryExprNode extends SNode {
 					break;
 			}
 			value = boolValue;
-			//TODO assignment-operator，%=，<,<=,!=,+=，boolean运算，2==3!=true
+			//TODO assignment-operator，%=，,+=，boolean运算，2==3!=true
 			//==,!=,
 		} else if (tag == Tag.EQEXPR) {
-			boolean boolValue = false;
-			int i;
-			double d;
+			boolean boolValue = false, bool2;
+			int i, i1;
+			double d, d1;
+			//in case that the first expression is 2==3 == true, in this case the grammar is correct. Otherwise, the operands will all by type of bool
+			// 2==3 == true correct
+			// true != 2==3 incorrect
+
 			switch (childExpressions.get(0).getDataType()) {
 				case Tag.INT:
 					i = (int) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++) {
-						NnaryExprNode tmp = childExpressions.get(m);
-						int tmpValue = (int) tmp.getValue();
-						switch (tmp.getOpt().getTag()) {
-							case Tag.EQ:
-								boolValue = i == tmpValue;
-								break;
-							case Tag.NE:
-								boolValue = i != tmpValue;
-								break;
-						}
+					i1 = (int) childExpressions.get(1).getValue();
+					switch (childExpressions.get(1).getOpt().getTag()) {
+						case Tag.EQ:
+							boolValue = i == i1;
+							break;
+						case Tag.NE:
+							boolValue = i != i1;
+							break;
 					}
 					break;
 				case Tag.DOUBLE:
 					d = (double) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++) {
-						NnaryExprNode tmp = childExpressions.get(m);
-						double tmpValue = (double) tmp.getValue();
-						switch (tmp.getOpt().getTag()) {
-							case Tag.EQ:
-								boolValue = d == tmpValue;
-								break;
-							case Tag.NE:
-								boolValue = d != tmpValue;
-								break;
-						}
+					d1 = (double) childExpressions.get(1).getValue();
+					switch (childExpressions.get(1).getOpt().getTag()) {
+						case Tag.EQ:
+							boolValue = d == d1;
+							break;
+						case Tag.NE:
+							boolValue = d != d1;
+							break;
 					}
 					break;
 				case Tag.BOOL:
 					boolValue = (Boolean) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++) {
-						NnaryExprNode tmp = childExpressions.get(m);
-						Boolean tmpValue = (Boolean) tmp.getValue();
-						switch (tmp.getOpt().getTag()) {
-							case Tag.EQ:
-								boolValue = boolValue == tmpValue;
-								break;
-							case Tag.NE:
-								boolValue = boolValue != tmpValue;
-								break;
-						}
+					bool2 = (Boolean) childExpressions.get(1).getValue();
+					switch (childExpressions.get(1).getOpt().getTag()) {
+						case Tag.EQ:
+							boolValue = boolValue == bool2;
+							break;
+						case Tag.NE:
+							boolValue = boolValue != bool2;
+							break;
 					}
 					break;
+			}
+			for (int j = 2; j < childExpressions.size(); j++) {
+				bool2 = (Boolean) childExpressions.get(j).getValue();
+				switch (childExpressions.get(j).getOpt().getTag()) {
+					case Tag.EQ:
+						boolValue = boolValue == bool2;
+						break;
+					case Tag.NE:
+						boolValue = boolValue != bool2;
+						break;
+				}
+
 			}
 			value = boolValue;
 		} else if (tag == Tag.LGANDEXPR) {
@@ -502,10 +507,13 @@ public class NnaryExprNode extends SNode {
 				NnaryExprNode tmp = childExpressions.get(m);
 				Boolean tmpValue = (Boolean) tmp.getValue();
 				boolValue = boolValue || tmpValue;
+				break;
 			}
+
 			value = boolValue;
 		}
 	}
+
 
 	@Override
 	public void traverse(int blank) {
@@ -530,37 +538,35 @@ public class NnaryExprNode extends SNode {
 		}
 	}
 
-    @Override
-    public void genBytecode(Program program) {
+	@Override
+	public void genBytecode(Program program) {
+/*
+		if (tag == Tag.CONSTVAL) {
+			program.addConstant(constVal.getLexeme(), dataType);
+		} else if (tag == Tag.VARLEXPR) {
 
-        if(tag == Tag.CONSTVAL) {
-            program.addConstant(constVal.getLexeme(), dataType);
-        } else if(tag == Tag.VARLEXPR) {
-
-            // get the index of the operand in the local variable area
-            // generate code to push the index onto the operand stack
-            Symbol symbol = currentEnv.get(identifier.getLexeme());
-            int opdIdx = symbol.getOpdIdx();
-            program.addCode(Opcode.iload, opdIdx);
-            program.addCode(Opcode.ipush, opdIdx);
-
-
-
-        } else if(tag == Tag.ARRLEXPR) {
-
-            // if it an array,
-            // generate code to calculate the element index
-            program.addCode(Opcode.iconst_0);
-            for(int i = 0; i < childExpressions.size(); i++) {
-                // for each dimension
-                // index minus 1 then multiplied by dimension length is added to the index
-                // generate code for these operations
-
-            }
+			// get the index of the operand in the local variable area
+			// generate code to push the index onto the operand stack
+			Symbol symbol = currentEnv.get(identifier.getLexeme());
+			int opdIdx = symbol.getOpdIdx();
+			program.addCode(Opcode.iload, opdIdx);
+			program.addCode(Opcode.ipush, opdIdx);
 
 
+		} else if (tag == Tag.ARRLEXPR) {
 
-        }
-    }
+			// if it an array,
+			// generate code to calculate the element index
+			program.addCode(Opcode.iconst_0);
+			for (int i = 0; i < childExpressions.size(); i++) {
+				// for each dimension
+				// index minus 1 then multiplied by dimension length is added to the index
+				// generate code for these operations
+
+			}
+
+
+		}*/
+	}
 
 }
