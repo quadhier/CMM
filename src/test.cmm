@@ -1,15 +1,12 @@
-/*
 int num = (3-4*(1+2)/1)%2;
-int mod = 4%4;
+int mod = 3*5%4;
 bool b = !true;
-*/
-
-bool c = b || true && false || 2==3;
-/*
-int[3][1] d;
+bool c = 2==3!=true;
+bool d = 2==3||true&&false||true;
+int[3][1] x;
 write(num);
 write(mod);
 write(b);
 write(c);
-*/
+write(d);
 

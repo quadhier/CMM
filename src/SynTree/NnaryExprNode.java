@@ -229,6 +229,8 @@ public class NnaryExprNode extends SNode {
                 }
 
 
+				prevDataType = nnaryExprNode.getDataType();
+
 			}
 			startLine = childExpressions.get(0).getStartLine();
 			startPos = childExpressions.get(0).getStartPos();
@@ -419,7 +421,7 @@ public class NnaryExprNode extends SNode {
 					break;
 				case Tag.DOUBLE:
 					d = (double) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++){
+					for (int m = 1; m < childExpressions.size(); m++) {
 						NnaryExprNode tmp = childExpressions.get(m);
 						double tmpValue = (double) tmp.getValue();
 						switch (tmp.getOpt().getTag()) {
@@ -440,29 +442,91 @@ public class NnaryExprNode extends SNode {
 					break;
 			}
 			value = boolValue;
-			// TODO RELATIVExpr 部分和assignment-operator，%=，<,<=,!=,+=，boolean运算，2==3!=true
-		} /*else if (tag == Tag.EQEXPR) {
-			boolean boolValue = false;
+			//TODO assignment-operator，%=，,+=，boolean运算，2==3!=true
+			//==,!=,
+		} else if (tag == Tag.EQEXPR) {
+			boolean boolValue = false, bool2;
+			int i, i1;
+			double d, d1;
+			//in case that the first expression is 2==3 == true, in this case the grammar is correct. Otherwise, the operands will all by type of bool
+			// 2==3 == true correct
+			// true != 2==3 incorrect
+
+			for (int m = 0; m < childExpressions.size(); m++) {
+				if (m == 0) {
+					switch (childExpressions.get(0).getDataType()) {
+						case Tag.INT:
+							i = (int) childExpressions.get(0).getValue();
+							i1 = (int) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = i == i1;
+									break;
+								case Tag.NE:
+									boolValue = i != i1;
+									break;
+							}
+							break;
+						case Tag.DOUBLE:
+							d = (double) childExpressions.get(0).getValue();
+							d1 = (double) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = d == d1;
+									break;
+								case Tag.NE:
+									boolValue = d != d1;
+									break;
+							}
+							break;
+						case Tag.BOOL:
+							boolValue = (Boolean) childExpressions.get(0).getValue();
+							bool2 = (Boolean) childExpressions.get(1).getValue();
+							switch (childExpressions.get(1).getOpt().getTag()) {
+								case Tag.EQ:
+									boolValue = boolValue == bool2;
+									break;
+								case Tag.NE:
+									boolValue = boolValue != bool2;
+									break;
+							}
+							break;
+					}
+					m++;
+				} else {
+					bool2 = (Boolean) childExpressions.get(m).getValue();
+					switch (childExpressions.get(m).getOpt().getTag()) {
+						case Tag.EQ:
+							boolValue = boolValue == bool2;
+							break;
+						case Tag.NE:
+							boolValue = boolValue != bool2;
+							break;
+					}
+				}
+			}
+			value = boolValue;
+		} else if (tag == Tag.LGANDEXPR) {
+			boolean boolValue;
 			boolValue = (Boolean) childExpressions.get(0).getValue();
 			for (int m = 1; m < childExpressions.size(); m++) {
 				NnaryExprNode tmp = childExpressions.get(m);
 				Boolean tmpValue = (Boolean) tmp.getValue();
-				switch (tmp.getOpt().getTag()) {
-					case '>':
-						boolValue = boolValue > tmpValue;
-						break;
-					case '/':
-						if (tmpValue == 0) {
-							System.err.println("Runtime Error: divided by 0 on line " + startLine + ", position " + startPos);
-							System.exit(1);
-						}
-						d /= tmpValue;
-						break;
-				}
+				boolValue = boolValue && tmpValue;
 			}
 			value = boolValue;
-		}*/
+		} else if (tag == Tag.LGOREXPR) {
+			boolean boolValue;
+			boolValue = (Boolean) childExpressions.get(0).getValue();
+			for (int m = 1; m < childExpressions.size(); m++) {
+				NnaryExprNode tmp = childExpressions.get(m);
+				Boolean tmpValue = (Boolean) tmp.getValue();
+				boolValue = boolValue || tmpValue;
+			}
+			value = boolValue;
+		}
 	}
+
 
 	@Override
 	public void traverse(int blank) {
@@ -487,37 +551,35 @@ public class NnaryExprNode extends SNode {
 		}
 	}
 
-    @Override
-    public void genBytecode(Program program) {
+	@Override
+	public void genBytecode(Program program) {
+/*
+		if (tag == Tag.CONSTVAL) {
+			program.addConstant(constVal.getLexeme(), dataType);
+		} else if (tag == Tag.VARLEXPR) {
 
-        if(tag == Tag.CONSTVAL) {
-            program.addConstant(constVal.getLexeme(), dataType);
-        } else if(tag == Tag.VARLEXPR) {
-
-            // get the index of the operand in the local variable area
-            // generate code to push the index onto the operand stack
-            Symbol symbol = currentEnv.get(identifier.getLexeme());
-            int opdIdx = symbol.getOpdIdx();
-            program.addCode(Opcode.iload, opdIdx);
-            program.addCode(Opcode.ipush, opdIdx);
-
-
-
-        } else if(tag == Tag.ARRLEXPR) {
-
-            // if it an array,
-            // generate code to calculate the element index
-            program.addCode(Opcode.iconst_0);
-            for(int i = 0; i < childExpressions.size(); i++) {
-                // for each dimension
-                // index minus 1 then multiplied by dimension length is added to the index
-                // generate code for these operations
-
-            }
+			// get the index of the operand in the local variable area
+			// generate code to push the index onto the operand stack
+			Symbol symbol = currentEnv.get(identifier.getLexeme());
+			int opdIdx = symbol.getOpdIdx();
+			program.addCode(Opcode.iload, opdIdx);
+			program.addCode(Opcode.ipush, opdIdx);
 
 
+		} else if (tag == Tag.ARRLEXPR) {
 
-        }
-    }
+			// if it an array,
+			// generate code to calculate the element index
+			program.addCode(Opcode.iconst_0);
+			for (int i = 0; i < childExpressions.size(); i++) {
+				// for each dimension
+				// index minus 1 then multiplied by dimension length is added to the index
+				// generate code for these operations
+
+			}
+
+
+		}*/
+	}
 
 }
