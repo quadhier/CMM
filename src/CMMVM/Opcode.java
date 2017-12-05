@@ -10,12 +10,16 @@ public class Opcode {
     public static final byte rem = 0x06;
 
     // stack operation
-    public static final byte ipush = 0x07;
+    public static final byte iconst_0 = 0x18;
+    public static final byte iconst_1 = 0x19;
+    public static final byte ildc = 0x07;
+    public static final byte dldc = 0x17;
     public static final byte iload = 0x08;
     public static final byte dload = 0x09;
     public static final byte aload = 0x0a;
     public static final byte newarray = 0x0b;
-    public static final byte store = 0x0c;
+    public static final byte istore = 0x0c;
+    public static final byte dstore = 0x1a;
     public static final byte iastore = 0x0d;
     public static final byte dastore = 0x0e;
 
@@ -28,8 +32,10 @@ public class Opcode {
     public static final byte ble = 0x14; // branch if less than or equal to
 
     // io
-    public static final byte read = 0x15;
-    public static final byte write = 0x16;
+    public static final byte iread = 0x15;
+    public static final byte dread = 0x16;
+    public static final byte iwrite = 0x1b;
+    public static final byte dwrite = 0x1c;
 
 
 }

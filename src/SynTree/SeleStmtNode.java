@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
 
@@ -74,7 +75,7 @@ public class SeleStmtNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
 
     }
 

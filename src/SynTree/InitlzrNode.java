@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Program;
 import Lexer.Identifer;
 import Lexer.Tag;
 
@@ -62,7 +63,7 @@ public class InitlzrNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
 
     }
 

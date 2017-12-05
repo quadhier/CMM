@@ -2,6 +2,7 @@ package SynTree;
 
 import CMMVM.Bytecode;
 import CMMVM.Opcode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
 import Lexer.Tag;
@@ -90,35 +91,20 @@ public class AsgmStmtNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
-        // get the index of the oprand in the local variable area
-        // generate code to push the index onto the operand stack
-        Symbol symbol = currentEnv.get(leftValueExpression.getIdentifier().getLexeme());
-        int opdIdx = symbol.getOpdIdx();
-        int addr = prog.size();
-        prog.add(new Bytecode(addr, Opcode.ipush, addr));
+    public void genBytecode(Program program) {
 
-        // if it an array,
-        // generate code to calculate the element index
-        if(symbol.getTag() == Tag.ARRDECL) {
-            ArrayList<NnaryExprNode> dimLengths = leftValueExpression.getChildExpressions();
-            for(NnaryExprNode nnaryExprNode : dimLengths) {
-                // for each dimension
-                // index minus 1 then multiplied by dimension length is added to the index
-                // generate code for these operations
-            }
-
-        }
-
-
+        // generate bytecode to calculate the operand index and array element index if any
+        leftValueExpression.genBytecode(program);
 
         // generate bytecode for calculating the expression
-        expression.genBytecode(prog, currentOpdIdx, constantPool);
-        // get the address of this byte code
+        expression.genBytecode(program);
+
+        // from stack top towards bottom,
+        // expression result, element index, array operand index
         if(expression.getDataType() == Tag.DOUBLE) {
-            prog.add(new Bytecode(addr, Opcode.dastore));
+            program.addCode(Opcode.dastore);
         } else {
-            prog.add(new Bytecode(addr, Opcode.iastore));
+            program.addCode(Opcode.iastore);
         }
 
 

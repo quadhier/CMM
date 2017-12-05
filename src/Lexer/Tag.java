@@ -60,8 +60,8 @@ public class Tag {
 
 	public static final int PROG = 310;			    // program
 	public static final int STMT = 335;			    // statement
-	public static final int DECL = 316;			    // declaration
-	public static final int DECLSPEC = 313;		    // declaration-specifier
+	//public static final int DECL = 316;			    // declaration
+	//public static final int DECLSPEC = 313;		    // declaration-specifier
     public static final int INITLZR = 314;		    // initializer
     public static final int COMPSTMT = 315;		    // compound-statement
 	public static final int ASGMSTMT = 331;		    // assignment-statement
@@ -80,8 +80,8 @@ public class Tag {
 	public static final int ADTVEXPR = 350;		    // addictive-expression
 	public static final int MLTVEXPR = 351;		    // multiplicative-expression
 	public static final int UNARYEXPR = 344;		// unary-expression
-	public static final int PRMYEXPR = 354;		    // primary-expression
-	public static final int LVALEXPR = 355;		    // left-value-expression
+	//public static final int PRMYEXPR = 354;		    // primary-expression
+	//public static final int LVALEXPR = 355;		    // left-value-expression
 	public static final int CONSTVAL = 356;		    // constant
 
     // the kind of declaration

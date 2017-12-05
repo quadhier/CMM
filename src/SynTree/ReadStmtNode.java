@@ -1,6 +1,8 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
+import CMMVM.Program;
 import Lexer.Tag;
 
 import java.util.ArrayList;
@@ -46,7 +48,31 @@ public class ReadStmtNode extends SNode {
 
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
+
+        leftValueExpression.genBytecode(program);
+
+        if(leftValueExpression.getTag() == Tag.ARRLEXPR) {
+
+            if(leftValueExpression.getDataType() == Tag.DOUBLE) {
+                program.addCode(Opcode.dread);
+                program.addCode(Opcode.dastore);
+            } else {
+                program.addCode(Opcode.iread);
+                program.addCode(Opcode.iastore);
+            }
+
+        } else if(leftValueExpression.getTag() == Tag.VARLEXPR) {
+
+            if(leftValueExpression.getDataType() == Tag.DOUBLE) {
+                program.addCode(Opcode.dread);
+                program.addCode(Opcode.dstore);
+            } else {
+                program.addCode(Opcode.iread);
+                program.addCode(Opcode.istore);
+            }
+
+        }
 
     }
 

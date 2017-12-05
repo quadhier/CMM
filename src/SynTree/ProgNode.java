@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Program;
 import Lexer.Tag;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class ProgNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
 
     }
 

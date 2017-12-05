@@ -1,6 +1,8 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
 import Lexer.Tag;
@@ -270,8 +272,46 @@ public class NnaryExprNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
 
+        if(tag == Tag.CONSTVAL) {
+            program.addConstant(constVal.getLexeme(), dataType);
+        } else if(tag == Tag.VARLEXPR) {
+
+            // get the index of the operand in the local variable area
+            // generate code to push the index onto the operand stack
+            Symbol symbol = currentEnv.get(identifier.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.iload, opdIdx);
+
+        } else if(tag == Tag.ARRLEXPR) {
+
+            // get the index of the operand in the local variable area
+            // generate code to push the index onto the operand stack
+            Symbol symbol = currentEnv.get(identifier.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.iload, opdIdx);
+
+            // if it an array,
+            // generate code to calculate the element index
+            program.addCode(Opcode.iconst_0);
+            for(int i = 0; i < childExpressions.size(); i++) {
+                // for each dimension
+                // index minus 1 then multiplied by dimension length is added to the index
+                // generate code for these operations
+                NnaryExprNode childExpression = childExpressions.get(i);
+                NnaryExprNode dimLength = symbol.getDimLengths().get(i);
+                program.addCode(Opcode.iconst_1);
+                childExpression.genBytecode(program);
+                program.addCode(Opcode.sub);
+                dimLength.genBytecode(program);
+                program.addCode(Opcode.mul);
+                program.addCode(Opcode.add);
+            }
+
+
+
+        }
     }
 
 }

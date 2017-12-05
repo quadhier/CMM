@@ -2,6 +2,7 @@ package SynTree;
 
 import CFG.BasicBlock;
 import CMMVM.Bytecode;
+import CMMVM.Program;
 import SymTable.Env;
 
 import java.util.ArrayList;
@@ -42,11 +43,10 @@ public class SynTree {
         return null;
     }
 
-    public ArrayList<Bytecode> genBytecode() {
-        ArrayList<Bytecode> codes = new ArrayList<>();
-        ArrayList<Object> constantPool = new ArrayList<>();
-        root.genBytecode(codes, 0, constantPool);
-        return codes;
+    public Program genBytecode() {
+        Program program = new Program();
+        root.genBytecode(program);
+        return program;
     }
 
 }

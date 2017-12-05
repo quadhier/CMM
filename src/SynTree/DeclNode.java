@@ -1,6 +1,8 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
 import Lexer.Tag;
@@ -169,7 +171,45 @@ public class DeclNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    public void genBytecode(Program program) {
+
+        if(tag == Tag.ARRDECL) {
+
+            for(InitlzrNode initlzrNode : initializers) {
+                // store the operand index in the symbol table
+                Symbol symbol = currentEnv.get(initlzrNode.getIdentifer().getLexeme());
+                symbol.setOpdIdx(program.getCurrentOpdInx());
+                // generate code to calculate the length of the array
+                program.addCode(Opcode.iconst_1);
+                for (NnaryExprNode nnaryExprNode : dimensionLengths) {
+                    nnaryExprNode.genBytecode(program);
+                    program.addCode(Opcode.mul);
+                }
+                // generate code to create an array
+                if(declarationSpecifer.getTag() == Tag.DOUBLE) {
+                    program.addCode(Opcode.newarray, Tag.DOUBLE);
+                } else {
+                    program.addCode(Opcode.newarray, Tag.INT);
+                }
+
+            }
+
+        } else if(tag == Tag.VARDECL) {
+
+            for(InitlzrNode initlzrNode : initializers) {
+                // store the operand index in the symbol table
+                Symbol symbol = currentEnv.get(initlzrNode.getIdentifer().getLexeme());
+                symbol.setOpdIdx(program.getCurrentOpdInx());
+
+                // generate code to create a variable
+                if(declarationSpecifer.getTag() == Tag.DOUBLE) {
+                    program.addCode(Opcode.dstore, Tag.DOUBLE);
+                } else {
+                    program.addCode(Opcode.istore, Tag.INT);
+                }
+
+            }
+        }
 
     }
 

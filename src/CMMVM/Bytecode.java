@@ -12,7 +12,7 @@ public class Bytecode {
     public Bytecode(int offset, byte opt) {
         this.offset = offset;
         this.opt = opt;
-        this.opd = 0;
+        this.opd = -1;
     }
 
     public Bytecode(int offset, byte opt, int opd) {
@@ -33,4 +33,7 @@ public class Bytecode {
         return opd;
     }
 
+    public void setOpd(int opd) {
+        this.opd = opd;
+    }
 }
