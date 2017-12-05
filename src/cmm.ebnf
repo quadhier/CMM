@@ -1,0 +1,79 @@
+
+<program> = <statement> { <statement> } ;
+
+<statement> = <declaration>
+| <compound-statement>
+| <assignment-statement>
+| <selection-statement>
+| <iteration-statement>
+| <jump-statement> 
+| <read-statement>
+| <write-statement> ;
+
+
+<declaration> = <declaration-specifiers> <initializer> { "," <initializer> } ";" ;
+
+<initializer> = <identifier> [ "=" <expression> ] ;
+
+<declaration-specifier> = ( "char" | "int" | "double" | "_Bool" ) { "[" <additive-expression> "]" } ;
+
+<compound-statement> = "{" { <statement> } "}" ;
+
+<assignment-statement> = <left-value-expression> <assignment-operator> <expression> ;
+
+<assignment-operator> = "=" | "*=" | "/=" | "%=" | "+=" | "-=";
+
+<selection-statement> = "if" "(" <expression> ")" <statement> [ "else" <statement> ]
+
+<iteration-statement> = "while" "(" <expression> ")" <statement>
+
+<jump-statement> = "continue" ";"
+| "break" ";"
+
+<read-statement> = "read" "(" <left-value-expression> ")"
+
+<write-statement> = "write" "(" <expression> ")"
+
+
+(* expression *)
+
+<expression> = <logical-OR-expression> ;
+
+<logical-OR-expression> = <logical-AND-expression> 
+| <logical-OR-expression> "||" <logical-AND-expression> ;
+
+<logical-AND-expression> = <equality-expression> 
+| <logical-AND-expression> "&&" <equality-expression> ;
+
+<equality-expression> = <relational-expression>
+| <equality-expression> "==" <relational-expression>
+| <equality-expression> "!=" <relational-expression> ;
+
+<relational-expression> = <additive-expression>
+| <relational-expression> "<" <additive-expression>
+| <relational-expression> ">" <additive-expression>
+| <relational-expression> ">=" <additive-expression>
+| <relational-expression> "<=" <additive-expression> ;
+
+<additive-expression> = <multiplicative-expression>
+| <additive-expression> "+" <multiplicative-expression>
+| <additive-expression> "-" <multiplicatvie-expression> ;
+
+<multiplicatvie-expression> = <unary-expression> 
+| <multiplicative-expression> "*" <unary-expression>
+| <multiplicative-expression> "/" <unary-expression>
+| <multiplicative-expression> "%" <unary-expression> ;
+
+<unary-expression> = [ <unary-operator> ] <primary-expression> ;
+
+<unary-operator> = "-" | "!" ;
+
+<primary-expression> = <left-value-expression>
+| <constant>
+| "(" <expression> ")" ;
+
+<left-value-expression> = <identifier> { "[" <additive-expression> "]" }
+
+<constant> = <integer-constant>
+| <floating-constant>
+| <boolean-constant> ;
