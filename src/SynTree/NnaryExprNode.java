@@ -224,7 +224,7 @@ public class NnaryExprNode extends SNode {
 				}
 
 				// equality operator cannot be used to compare boolean and numeric type
-				if ((optTag == Tag.EQ || optTag == Tag.NE)
+				if ((optTag == Tag.EQ || optTag == Tag.NE || optTag == '<' || optTag == '>' || optTag == Tag.LE || optTag == Tag.GE)
 						&& prevDataType != -1 // not the first one
 						&& prevDataType != nnaryExprNode.getDataType() // data type of previous child expression is different from that of this one
 						&& (prevDataType == Tag.BOOL || nnaryExprNode.getDataType() == Tag.BOOL)) { // previous one or this one is boolean type, as '==' is applicable to numeric types
@@ -296,14 +296,11 @@ public class NnaryExprNode extends SNode {
             Symbol symbol = currentEnv.get(identifier.getLexeme());
             int opdIdx = symbol.getOpdIdx();
             program.addCode(Opcode.iload, opdIdx);
+            program.addCode(Opcode.ipush, opdIdx);
+
+
 
         } else if(tag == Tag.ARRLEXPR) {
-
-            // get the index of the operand in the local variable area
-            // generate code to push the index onto the operand stack
-            Symbol symbol = currentEnv.get(identifier.getLexeme());
-            int opdIdx = symbol.getOpdIdx();
-            program.addCode(Opcode.iload, opdIdx);
 
             // if it an array,
             // generate code to calculate the element index
@@ -312,14 +309,7 @@ public class NnaryExprNode extends SNode {
                 // for each dimension
                 // index minus 1 then multiplied by dimension length is added to the index
                 // generate code for these operations
-                NnaryExprNode childExpression = childExpressions.get(i);
-                NnaryExprNode dimLength = symbol.getDimLengths().get(i);
-                program.addCode(Opcode.iconst_1);
-                childExpression.genBytecode(program);
-                program.addCode(Opcode.sub);
-                dimLength.genBytecode(program);
-                program.addCode(Opcode.mul);
-                program.addCode(Opcode.add);
+
             }
 
 

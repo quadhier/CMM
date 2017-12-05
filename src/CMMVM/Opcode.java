@@ -14,6 +14,7 @@ public class Opcode {
     public static final byte iconst_1 = 0x19;
     public static final byte ildc = 0x07;
     public static final byte dldc = 0x17;
+    public static final byte ipush = 0x1d;
     public static final byte iload = 0x08;
     public static final byte dload = 0x09;
     public static final byte aload = 0x0a;

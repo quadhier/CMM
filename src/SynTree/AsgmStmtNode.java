@@ -94,18 +94,48 @@ public class AsgmStmtNode extends SNode {
     public void genBytecode(Program program) {
 
         // generate bytecode to calculate the operand index and array element index if any
-        leftValueExpression.genBytecode(program);
+        // and push them onto the stack
+        int lValTag = leftValueExpression.getTag();
+        Token lValIdt = leftValueExpression.getIdentifier();
+        int exprTag = expression.getTag();
+        if(lValTag == Tag.ARRLEXPR) {
+            Symbol symbol = currentEnv.get(lValIdt.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.ipush, opdIdx);
+
+            // generate code to calculate element index
+
+
+        } else {
+            Symbol symbol = currentEnv.get(leftValueExpression.getIdentifier().getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.ipush, opdIdx);
+
+        }
 
         // generate bytecode for calculating the expression
         expression.genBytecode(program);
+        
+
 
         // from stack top towards bottom,
         // expression result, element index, array operand index
-        if(expression.getDataType() == Tag.DOUBLE) {
-            program.addCode(Opcode.dastore);
-        } else {
-            program.addCode(Opcode.iastore);
+        if(lValTag == Tag.ARRLEXPR) {
+
+            if(exprTag == Tag.DOUBLE) {
+                program.addCode(Opcode.dastore);
+            } else { // int or bool
+                program.addCode(Opcode.iastore);
+            }
+        } else { // Tag.VARLEXPR
+
+            if(exprTag == Tag.DOUBLE) {
+                program.addCode(Opcode.dstore);
+            } else {
+                program.addCode(Opcode.istore);
+            }
         }
+
 
 
     }

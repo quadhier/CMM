@@ -207,15 +207,27 @@ public class DeclNode extends SNode {
 
             for(InitlzrNode initlzrNode : initializers) {
                 // store the operand index in the symbol table
+                // and generate code to push its index onto the stack
                 Symbol symbol = currentEnv.get(initlzrNode.getIdentifer().getLexeme());
-                symbol.setOpdIdx(program.getCurrentOpdInx());
+                int opdIdx = program.getCurrentOpdInx();
+                symbol.setOpdIdx(opdIdx);
+                program.addCode(Opcode.ipush, opdIdx);
+
+                NnaryExprNode nnaryExprNode = initlzrNode.getExpression();
+                if(nnaryExprNode != null) {
+                    nnaryExprNode.genBytecode(program);
+                } else {
+                    program.addCode(Opcode.iconst_0);
+                }
 
                 // generate code to create a variable
                 if(declarationSpecifer.getTag() == Tag.DOUBLE) {
-                    program.addCode(Opcode.dstore, Tag.DOUBLE);
+                    program.addCode(Opcode.dstore);
                 } else {
-                    program.addCode(Opcode.istore, Tag.INT);
+                    program.addCode(Opcode.istore);
                 }
+
+
 
             }
         }
