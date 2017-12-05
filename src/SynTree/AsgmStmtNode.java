@@ -2,6 +2,7 @@ package SynTree;
 
 import CMMVM.Bytecode;
 import CMMVM.Opcode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
 import Lexer.Tag;
@@ -90,36 +91,51 @@ public class AsgmStmtNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
-        // get the index of the oprand in the local variable area
-        // generate code to push the index onto the operand stack
-        Symbol symbol = currentEnv.get(leftValueExpression.getIdentifier().getLexeme());
-        int opdIdx = symbol.getOpdIdx();
-        int addr = prog.size();
-        prog.add(new Bytecode(addr, Opcode.ipush, addr));
+    public void genBytecode(Program program) {
 
-        // if it an array,
-        // generate code to calculate the element index
-        if(symbol.getTag() == Tag.ARRDECL) {
-            ArrayList<NnaryExprNode> dimLengths = leftValueExpression.getChildExpressions();
-            for(NnaryExprNode nnaryExprNode : dimLengths) {
-                // for each dimension
-                // index minus 1 then multiplied by dimension length is added to the index
-                // generate code for these operations
-            }
+        // generate bytecode to calculate the operand index and array element index if any
+        // and push them onto the stack
+        int lValTag = leftValueExpression.getTag();
+        Token lValIdt = leftValueExpression.getIdentifier();
+        int exprTag = expression.getTag();
+        if(lValTag == Tag.ARRLEXPR) {
+            Symbol symbol = currentEnv.get(lValIdt.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.ipush, opdIdx);
+
+            // generate code to calculate element index
+
+
+        } else {
+            Symbol symbol = currentEnv.get(leftValueExpression.getIdentifier().getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.ipush, opdIdx);
 
         }
-
-
 
         // generate bytecode for calculating the expression
-        expression.genBytecode(prog, currentOpdIdx, constantPool);
-        // get the address of this byte code
-        if(expression.getDataType() == Tag.DOUBLE) {
-            prog.add(new Bytecode(addr, Opcode.dastore));
-        } else {
-            prog.add(new Bytecode(addr, Opcode.iastore));
+        expression.genBytecode(program);
+        
+
+
+        // from stack top towards bottom,
+        // expression result, element index, array operand index
+        if(lValTag == Tag.ARRLEXPR) {
+
+            if(exprTag == Tag.DOUBLE) {
+                program.addCode(Opcode.dastore);
+            } else { // int or bool
+                program.addCode(Opcode.iastore);
+            }
+        } else { // Tag.VARLEXPR
+
+            if(exprTag == Tag.DOUBLE) {
+                program.addCode(Opcode.dstore);
+            } else {
+                program.addCode(Opcode.istore);
+            }
         }
+
 
 
     }

@@ -1,6 +1,8 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
+import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Identifer;
 import Lexer.Tag;
@@ -15,7 +17,7 @@ public class NnaryExprNode extends SNode {
 	private ArrayList<NnaryExprNode> childExpressions;
 	private Token constVal; // for constant value
 	private Identifer identifier; // for left-value-expression
-	private Object value;   //
+	private Object value;
 	// the following values are calculated and used in checkAndBuild()
 	private int startLine;
 	private int startPos; // record the start position of this expression
@@ -71,6 +73,7 @@ public class NnaryExprNode extends SNode {
 	public int getEndPos() {
 		return endPos;
 	}
+
 
 	public void setEndPos(int endPos) {
 		this.endPos = endPos;
@@ -207,7 +210,7 @@ public class NnaryExprNode extends SNode {
 				}
 
 				// equality operator cannot be used to compare boolean and numeric type
-				if ((optTag == Tag.EQ || optTag == Tag.NE)
+				if ((optTag == Tag.EQ || optTag == Tag.NE || optTag == '<' || optTag == '>' || optTag == Tag.LE || optTag == Tag.GE)
 						&& prevDataType != -1 // not the first one
 						&& prevDataType != nnaryExprNode.getDataType() // data type of previous child expression is different from that of this one
 						&& (prevDataType == Tag.BOOL || nnaryExprNode.getDataType() == Tag.BOOL)) { // previous one or this one is boolean type, as '==' is applicable to numeric types
@@ -527,9 +530,37 @@ public class NnaryExprNode extends SNode {
 		}
 	}
 
-	@Override
-	public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
+    @Override
+    public void genBytecode(Program program) {
 
-	}
+        if(tag == Tag.CONSTVAL) {
+            program.addConstant(constVal.getLexeme(), dataType);
+        } else if(tag == Tag.VARLEXPR) {
+
+            // get the index of the operand in the local variable area
+            // generate code to push the index onto the operand stack
+            Symbol symbol = currentEnv.get(identifier.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            program.addCode(Opcode.iload, opdIdx);
+            program.addCode(Opcode.ipush, opdIdx);
+
+
+
+        } else if(tag == Tag.ARRLEXPR) {
+
+            // if it an array,
+            // generate code to calculate the element index
+            program.addCode(Opcode.iconst_0);
+            for(int i = 0; i < childExpressions.size(); i++) {
+                // for each dimension
+                // index minus 1 then multiplied by dimension length is added to the index
+                // generate code for these operations
+
+            }
+
+
+
+        }
+    }
 
 }

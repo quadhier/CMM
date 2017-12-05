@@ -2,6 +2,7 @@ package SynTree;
 
 
 import CMMVM.Bytecode;
+import CMMVM.Program;
 import Lexer.Tag;
 import SymTable.Env;
 
@@ -61,8 +62,10 @@ public class CompStmtNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
-
+    public void genBytecode(Program program) {
+        for (StmtNode stmtNode : statements) {
+            stmtNode.genBytecode(program);
+        }
     }
 
 }
