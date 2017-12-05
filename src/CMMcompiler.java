@@ -68,7 +68,7 @@ public class CMMcompiler {
             return;
         }
 
-        //synTree.traverse(0);
+        synTree.traverse(0);
         synTree.visit();
 
 
