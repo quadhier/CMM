@@ -7,7 +7,7 @@ public class Operand {
 
     private int intVal;
     private double doublVal;
-    private boolean boolVal;
+    //private boolean boolVal;
     private Object arrVal;
 
     public Operand(int tag, int val) {
@@ -22,7 +22,7 @@ public class Operand {
 
     public Operand(int tag, boolean val) {
         this.tag = tag;
-        this.boolVal = val;
+        //this.boolVal = val;
     }
 
     public int getTag() {
@@ -41,8 +41,8 @@ public class Operand {
         return this.doublVal;
     }
 
-    public boolean getBoolVal() {
-        return this.boolVal;
-    }
+//    public boolean getBoolVal() {
+//        return this.boolVal;
+//    }
 
 }

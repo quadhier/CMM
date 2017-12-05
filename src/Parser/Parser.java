@@ -59,7 +59,7 @@ public class Parser {
         t = peek(1);
         while(true) {
             StmtNode stmtNode = statement();
-            if(stmtNode != null) {
+            if(stmtNode != null && stmtNode.getChild() != null) {
                 progNode.addStatement(stmtNode);
             } else {
                 break;

@@ -59,8 +59,10 @@ public class CMMcompiler {
         // get parse tree
         SNode root = parser.parse();
         SynTree synTree = new SynTree(root, filepath);
+
         // check semantic and build symbol table
         synTree.checkAndBuild();
+
         // report warnings and errors
         // and if there are only warnings without errors, proceed
         Failure.reportFailure();
@@ -69,8 +71,7 @@ public class CMMcompiler {
         }
 
         synTree.traverse(0);
-        synTree.visit();
-
+        //synTree.visit();
 
         // build CFG
 

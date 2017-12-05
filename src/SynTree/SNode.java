@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Operand;
 import SymTable.Env;
 
 import java.util.ArrayList;
@@ -28,6 +29,6 @@ public abstract class SNode {
 
     public abstract void traverse(int blank);
 
-    public abstract void genBytecode(ArrayList<Bytecode> prog);
+    public abstract void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool);
 
 }

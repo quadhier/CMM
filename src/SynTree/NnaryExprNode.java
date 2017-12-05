@@ -72,6 +72,10 @@ public class NnaryExprNode extends SNode {
 		return endPos;
 	}
 
+	public ArrayList<NnaryExprNode> getChildExpressions() {
+		return childExpressions;
+	}
+
 	public void setEndPos(int endPos) {
 		this.endPos = endPos;
 	}
@@ -278,9 +282,9 @@ public class NnaryExprNode extends SNode {
 		}
 	}
 
-	@Override
-	public void genBytecode(ArrayList<Bytecode> prog) {
+    @Override
+    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
 
-	}
+    }
 
 }
