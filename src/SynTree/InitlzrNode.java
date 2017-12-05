@@ -37,8 +37,7 @@ public class InitlzrNode extends SNode {
 
     @Override
     public void checkAndBuild() {
-        // do nothing, even not to be invoked
-        // as checkAndBuild() has been finished in the DeclNode, with enough context
+        expression.setCurrentEnv(currentEnv);
     }
 
     @Override

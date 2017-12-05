@@ -180,7 +180,9 @@ public class NnaryExprNode extends SNode {
 			int prevDataType = -1;
 			boolean hasUndefined = false;
 			boolean hasDouble = false;
-			for (NnaryExprNode nnaryExprNode : childExpressions) {
+			for (int i = 0; i < childExpressions.size(); i++) {
+
+                NnaryExprNode nnaryExprNode = childExpressions.get(i);
 				nnaryExprNode.setCurrentEnv(currentEnv);
 				nnaryExprNode.checkAndBuild();
 
@@ -190,6 +192,9 @@ public class NnaryExprNode extends SNode {
 				} else if (nnaryExprNode.getDataType() == Tag.DOUBLE) {
 					hasDouble = true;
 				}
+
+				sampleOpt = nnaryExprNode.getOpt() == null ? sampleOpt : nnaryExprNode.getOpt();
+				optTag = sampleOpt.getTag();
 
 				// operators except '==', '!=', '||' and '&&' cannot be applied on the boolean type variables
 				if (optTag != Tag.EQ && optTag != Tag.NE && optTag != Tag.OR && optTag != Tag.AND && nnaryExprNode.getDataType() == Tag.BOOL) {
@@ -203,23 +208,26 @@ public class NnaryExprNode extends SNode {
 
 
 				// '%' cannot be applied on double type
-				Token tagetOpt = nnaryExprNode.getOpt();
-				if (tagetOpt != null && tagetOpt.getTag() == '%'
-						&& (prevDataType == Tag.DOUBLE || nnaryExprNode.getDataType() == Tag.DOUBLE)) {
-					Failure.addFailure(SynTree.getFilepath(), tagetOpt.getLine(), tagetOpt.getStartpos(), Failure.ERROR, "'" + tagetOpt.getLexeme() + "' cannot be applied to double type");
+				if (sampleOpt.getTag() == '%'&& nnaryExprNode.getDataType() == Tag.DOUBLE) {
+					Failure.addFailure(SynTree.getFilepath(), sampleOpt.getLine(), sampleOpt.getStartpos(), Failure.ERROR, "'" + sampleOpt.getLexeme() + "' cannot be applied to double type");
 				}
+
 
 				// equality operator cannot be used to compare boolean and numeric type
-				if ((optTag == Tag.EQ || optTag == Tag.NE || optTag == '<' || optTag == '>' || optTag == Tag.LE || optTag == Tag.GE)
-						&& prevDataType != -1 // not the first one
-						&& prevDataType != nnaryExprNode.getDataType() // data type of previous child expression is different from that of this one
-						&& (prevDataType == Tag.BOOL || nnaryExprNode.getDataType() == Tag.BOOL)) { // previous one or this one is boolean type, as '==' is applicable to numeric types
+				if ((optTag == Tag.EQ || optTag == Tag.NE)
+						&& i == 1
+						&& childExpressions.get(0).getDataType() != nnaryExprNode.getDataType() // data type of previous child expression is different from that of this one
+						&& (childExpressions.get(0).getDataType() == Tag.BOOL || nnaryExprNode.getDataType() == Tag.BOOL)) { // previous one or this one is boolean type, as '==' is applicable to numeric types
 					Failure.addFailure(SynTree.getFilepath(), nnaryExprNode.getOpt().getLine(), nnaryExprNode.getOpt().getStartpos(), Failure.ERROR,
-							nnaryExprNode.getOpt().getLexeme() + " cannot be used to compare numeric and boolean types");
+							 "'" + nnaryExprNode.getOpt().getLexeme() + "' cannot be used to compare numeric and boolean types");
 				}
+                if((optTag == Tag.EQ || optTag == Tag.NE)
+                        && i > 1
+                        && nnaryExprNode.getDataType() != Tag.BOOL) {
+                    Failure.addFailure(SynTree.getFilepath(), nnaryExprNode.getOpt().getLine(), nnaryExprNode.getOpt().getStartpos(), Failure.ERROR,
+                            "'" + nnaryExprNode.getOpt().getLexeme() + "' cannot be used to compare numeric and boolean types");
+                }
 
-
-				prevDataType = nnaryExprNode.getDataType();
 
 			}
 			startLine = childExpressions.get(0).getStartLine();
@@ -432,7 +440,7 @@ public class NnaryExprNode extends SNode {
 					break;
 			}
 			value = boolValue;
-			//TODO RELATIVExpr 部分和assignment-operator，%=，<,<=,!=,+=，boolean运算，2==3!=true
+			// TODO RELATIVExpr 部分和assignment-operator，%=，<,<=,!=,+=，boolean运算，2==3!=true
 		} /*else if (tag == Tag.EQEXPR) {
 			boolean boolValue = false;
 			boolValue = (Boolean) childExpressions.get(0).getValue();

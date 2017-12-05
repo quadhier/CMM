@@ -483,10 +483,10 @@ public class Parser {
 
 
     // <relational-expression> = <additive-expression>
-    // | <relational-expression> "<" <additive-expression>
-    // | <relational-expression> ">" <additive-expression>
-    // | <relational-expression> ">=" <additive-expression>
-    // | <relational-expression> "<=" <additive-expression> ;
+    // | <additive-expression> "<" <additive-expression>
+    // | <additive-expression> ">" <additive-expression>
+    // | <additive-expression> ">=" <additive-expression>
+    // | <additive-expression> "<=" <additive-expression> ;
     private NnaryExprNode relationalExpression() {
         // if it is not a complete relational-expression
         // return its child expression node
@@ -500,14 +500,13 @@ public class Parser {
         NnaryExprNode relaExprNode = new NnaryExprNode(Tag.RELAEXPR);
         relaExprNode.addChildExpression(adtvExprNode);
         t = peek(1);
-        while(t != null && (t.getTag() == '<' || t.getTag() == '>'
+        if(t != null && (t.getTag() == '<' || t.getTag() == '>'
                 || t.getTag() == Tag.LE || t.getTag() == Tag.GE)) {
             Token opt = t;
             extract(1);
             adtvExprNode = additiveExpression();
             adtvExprNode.setOpt(opt);
             relaExprNode.addChildExpression(adtvExprNode);
-            t = peek(1);
         }
         return relaExprNode;
     }

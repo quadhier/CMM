@@ -47,7 +47,7 @@ a[12] = 1;
 e = 3;
 
 // inconsistent dimension length
-a[32][23] = 2;
+a[]
 
 // non-integer array size in left-value-expression
 e[2][3.3] = 1;

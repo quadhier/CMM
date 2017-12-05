@@ -55,7 +55,9 @@ public class CMMVM {
                     break;
                 case Opcode.newarray:
                     break;
-                case Opcode.store:
+                case Opcode.istore:
+                    break;
+                case Opcode.dstore:
                     break;
                 case Opcode.iastore:
                     break;
@@ -77,9 +79,13 @@ public class CMMVM {
                     break;
 
                 // io operation
-                case Opcode.read:
+                case Opcode.iread:
                     break;
-                case Opcode.write:
+                case Opcode.dread:
+                    break;
+                case Opcode.iwrite:
+                    break;
+                case Opcode.dwrite:
                     break;
                 default:
                         break;

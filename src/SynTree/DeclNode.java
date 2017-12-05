@@ -45,20 +45,12 @@ public class DeclNode extends SNode {
 	@Override
 	public void checkAndBuild() {
 
-		// set environment of child nodes
-		if (dimensionLengths != null) {
-			for (NnaryExprNode adtvExprNode : dimensionLengths) {
-				adtvExprNode.setCurrentEnv(currentEnv);
-			}
-		}
-		for (InitlzrNode initlzrNode : initializers) {
-			initlzrNode.setCurrentEnv(currentEnv);
-		}
 
 		// if it is an array check the length of each dimension
 		// to ensure they are all of type int
 		if (tag == Tag.ARRDECL) {
 			for (NnaryExprNode nnaryExprNode : dimensionLengths) {
+			    nnaryExprNode.setCurrentEnv(currentEnv);
 				nnaryExprNode.checkAndBuild();
 				if (nnaryExprNode.getDataType() != Tag.INT) {
 					Failure.addFailure(SynTree.getFilepath(), nnaryExprNode.getStartLine(), nnaryExprNode.getStartPos(), Failure.ERROR, "size of array has non-integer type");
@@ -66,8 +58,12 @@ public class DeclNode extends SNode {
 			}
 		}
 
+
 		int declDataType = declarationSpecifer.getTag();
 		for (InitlzrNode initlzrNode : initializers) {
+
+		    initlzrNode.setCurrentEnv(currentEnv);
+		    initlzrNode.checkAndBuild();
 
 			// check if it is redefinition or initialization of an array
 			// put identifiers into symbols if there are no errors
