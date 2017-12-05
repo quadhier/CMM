@@ -45,7 +45,7 @@ public class ConstValNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog) {
+    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
 
     }
 

@@ -14,8 +14,8 @@ public class CMMcompiler {
 
     public static void main(String[] args) {
 
-        String filepath = "src/test.cmm";
-//        String filepath = "src/test_semantic_errors.cmm";
+//        String filepath = "src/test.cmm";
+        String filepath = "src/test_semantic_errors.cmm";
 //        String filepath = args[0];
         FileReader reader = null;
         try {
@@ -59,8 +59,10 @@ public class CMMcompiler {
         // get parse tree
         SNode root = parser.parse();
         SynTree synTree = new SynTree(root, filepath);
+
         // check semantic and build symbol table
         synTree.checkAndBuild();
+
         // report warnings and errors
         // and if there are only warnings without errors, proceed
         Failure.reportFailure();
@@ -68,8 +70,8 @@ public class CMMcompiler {
             return;
         }
 
-        //synTree.traverse(0);
-        synTree.visit();
+        synTree.traverse(0);
+        //synTree.visit();
 
 
         // build CFG

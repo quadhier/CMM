@@ -15,7 +15,7 @@ public class SynTree {
 
     public SynTree(SNode root, String filepath) {
         this.root = root;
-        this.filepath = filepath;
+        SynTree.filepath = filepath;
         rootEnv = new Env(null);
     }
 
@@ -43,9 +43,10 @@ public class SynTree {
     }
 
     public ArrayList<Bytecode> genBytecode() {
-        ArrayList<Bytecode> prog = new ArrayList<>();
-        root.genBytecode(prog);
-        return prog;
+        ArrayList<Bytecode> codes = new ArrayList<>();
+        ArrayList<Object> constantPool = new ArrayList<>();
+        root.genBytecode(codes, 0, constantPool);
+        return codes;
     }
 
 }

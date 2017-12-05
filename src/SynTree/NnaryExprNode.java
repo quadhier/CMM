@@ -59,6 +59,10 @@ public class NnaryExprNode extends SNode {
         return endPos;
     }
 
+    public ArrayList<NnaryExprNode> getChildExpressions() {
+        return childExpressions;
+    }
+
     public void setOpt(Token opt) {
         this.opt = opt;
     }
@@ -128,6 +132,14 @@ public class NnaryExprNode extends SNode {
                 endLine = identifier.getLine();
                 endPos = identifier.getEndpos();
             } else {
+
+                // check if dimension is inconsistent
+                if(childExpressions.size() != symbol.getDimension()) {
+                    Failure.addFailure(SynTree.getFilepath(), identifier.getLine(), identifier.getStartpos(), Failure.ERROR,
+                            "array '" + identifier.getLexeme() + "''s dimension is inconsistent with its declaration");
+                }
+
+
                 for (NnaryExprNode nnaryExprNode : childExpressions) {
                     nnaryExprNode.setCurrentEnv(currentEnv);
                     nnaryExprNode.checkAndBuild();
@@ -258,7 +270,7 @@ public class NnaryExprNode extends SNode {
     }
 
     @Override
-    public void genBytecode(ArrayList<Bytecode> prog) {
+    public void genBytecode(ArrayList<Bytecode> prog, int currentOpdIdx, ArrayList<Object> constantPool) {
 
     }
 

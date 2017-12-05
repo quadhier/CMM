@@ -4,10 +4,16 @@ import CFG.TAC;
 
 public class Bytecode {
 
-    int offset;
+    private int offset;
 
-    byte opt;
-    int opd;
+    private byte opt;
+    private int opd;
+
+    public Bytecode(int offset, byte opt) {
+        this.offset = offset;
+        this.opt = opt;
+        this.opd = 0;
+    }
 
     public Bytecode(int offset, byte opt, int opd) {
         this.offset = offset;

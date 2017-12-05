@@ -46,6 +46,9 @@ a = b + f;
 a[12] = 1;
 e = 3;
 
+// inconsistent dimension length
+a[32][23] = 2;
+
 // non-integer array size in left-value-expression
 e[2][3.3] = 1;
 
@@ -55,9 +58,16 @@ c  = !(323+32);
 c = !21;
 c = true + true * 23;
 c = 23 == true;
+b = b % 23.0;
+c = true || 4;
+c = c && 3 ;
+c = c && c || c;
 
 // illegal data type of expression in selection-statement
 if(a)
 {
     a += 1;
 }
+
+
+a + b
