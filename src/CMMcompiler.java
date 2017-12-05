@@ -71,7 +71,7 @@ public class CMMcompiler {
         }
 
         synTree.traverse(0);
-        //synTree.visit();
+        synTree.visit();
 
         // build CFG
 
