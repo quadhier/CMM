@@ -14,8 +14,8 @@ public class CMMcompiler {
 
     public static void main(String[] args) {
 
-//        String filepath = "src/test.cmm";
-        String filepath = "src/test_semantic_errors.cmm";
+        String filepath = "src/test.cmm";
+//        String filepath = "src/test_semantic_errors.cmm";
 //        String filepath = args[0];
         FileReader reader = null;
         try {
@@ -72,7 +72,6 @@ public class CMMcompiler {
 
         synTree.traverse(0);
         //synTree.visit();
-
 
         // build CFG
 

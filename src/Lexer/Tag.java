@@ -72,7 +72,7 @@ public class Tag {
     public static final int WRITESTMT = 341;		// write-statement
 
     // expression
-	public static final int EXPR = 342;			    // expression
+	//public static final int EXPR = 342;			    // expression
 	public static final int LGOREXPR = 346;		    // logical-OR-expression
 	public static final int LGANDEXPR = 347;		// logical-AND-expression
 	public static final int EQEXPR = 348;			// equality-expression
