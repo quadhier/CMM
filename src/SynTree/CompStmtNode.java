@@ -38,7 +38,9 @@ public class CompStmtNode extends SNode {
 
     @Override
     public void visit() {
-
+        for(StmtNode stmtNode: statements){
+            stmtNode.visit();
+        }
     }
 
     @Override

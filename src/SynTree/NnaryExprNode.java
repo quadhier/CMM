@@ -88,6 +88,31 @@ public class NnaryExprNode extends SNode {
 		return value;
 	}
 
+	public void setValue(Object value) {
+		if (tag == Tag.VARLEXPR) {
+			Symbol symbol = currentEnv.get(identifier.getLexeme());
+			symbol.setValue(value);
+		} else if (tag == Tag.ARRLEXPR) {
+			Symbol symbol = currentEnv.get(identifier.getLexeme());
+			int dimension = symbol.getDimension();
+			ArrayList<NnaryExprNode> dimLengths = symbol.getDimLengths();
+			Object array[] = (Object[]) symbol.getValue();
+
+			// to calculate the location of the target value in one-dimensional array, which we convert multi-dimensional array to
+			int location = 0;
+			// e.g. int[2][3][4] a;  a[1][2][3] -> 1*3*4 + 2 * 4 + 3
+			// dimension is 3 here
+			for (int i = 0; i < dimension; i++) {
+				int tmpDimLength = (int) childExpressions.get(i).getValue(); // tmpDimLength is 1,2,3 respectively
+				for (int j = i + 1; j < dimension; j++)
+					tmpDimLength *= (int) dimLengths.get(j).getValue();
+				location += tmpDimLength;
+			}
+			array[location] = value;
+		}
+		this.value = value;
+	}
+
 	public void addChildExpression(NnaryExprNode childExpression) {
 		childExpressions.add(childExpression);
 	}

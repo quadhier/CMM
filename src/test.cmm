@@ -1,4 +1,4 @@
-
+int true;
 int num = (3-4*(1+2)/1)%2;
 int mod = 3*5%4;
 bool b = !true;

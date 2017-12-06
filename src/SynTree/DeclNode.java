@@ -134,7 +134,7 @@ public class DeclNode extends SNode {
 						symbol.setValue(new double[totalNum]);
 				}
 			}else if (tag == Tag.VARDECL){
-				initlzrNode.getExpression().visit();
+				//initlzrNode.getExpression().visit();  //for debugging use,visit first so you can learn the values of expressions
 				if (initlzrNode.getExpression() == null)
 					return;
 				symbol.setValue(initlzrNode.getExpression().getValue());

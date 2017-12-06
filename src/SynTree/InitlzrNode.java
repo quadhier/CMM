@@ -44,7 +44,8 @@ public class InitlzrNode extends SNode {
 
     @Override
     public void visit() {
-
+        // do nothing
+        // as visit() has been finished in the DeclNode. with enough context
     }
 
     @Override
