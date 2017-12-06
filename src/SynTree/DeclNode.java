@@ -114,6 +114,8 @@ public class DeclNode extends SNode {
 
 	@Override
 	public void visit() {
+		if (currentEnv.isContinueLoop()||currentEnv.isBreakLoop())
+			return;
 		for (InitlzrNode initlzrNode : initializers) {
 			Identifer currIdt = initlzrNode.getIdentifer();
 			Symbol symbol = currentEnv.get(currIdt.getLexeme());

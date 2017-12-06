@@ -70,6 +70,8 @@ public class AsgmStmtNode extends SNode {
 
 	@Override
 	public void visit() {
+    	if (currentEnv.isContinueLoop()||currentEnv.isBreakLoop())
+    		return;
 		switch (leftValueExpression.getDataType()) {
 			case Tag.INT:
 				switch (assignmentOperator.getTag()) {

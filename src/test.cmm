@@ -1,5 +1,6 @@
-int true;
-int num = (3-4*(1+2)/1)%2;
+
+
+/*int num = (3-4*(1+2)/1)%2;
 int mod = 3*5%4;
 bool b = !true;
 bool c = 2==3!=true;
@@ -10,8 +11,32 @@ write(mod);
 write(b);
 write(c);
 write(d);
-/*
-int a = 1;
-a = 2;
+
+
+double a = 5;
+a /= 0;
+write(a);
 int[2] b;
+
 */
+
+int a=4;
+/*while(a>0){
+    a-=1;
+    if(true){
+        if(a==2){
+            break;
+        }
+    }
+     write(a);
+    }*/
+    a=5;
+while(a>0)
+    if(true){
+        if(a==4){
+            a-=2;
+            continue;
+        }else
+            a-=1;
+        write(a);
+    }

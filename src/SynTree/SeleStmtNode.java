@@ -53,7 +53,12 @@ public class SeleStmtNode extends SNode {
 
     @Override
     public void visit() {
-
+        if (currentEnv.isContinueLoop() || currentEnv.isBreakLoop())
+            return;
+        if((boolean)expression.getValue()){
+            ifStatement.visit();
+        }else if (elseStatement!=null)
+            elseStatement.visit();
     }
 
     @Override
