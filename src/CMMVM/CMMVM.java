@@ -33,13 +33,19 @@ public class CMMVM {
 
             switch (inst.getOpt()) {
                 // arithmetic
-                case Opcode.add:
+                case Opcode.iadd:
                     break;
-                case Opcode.sub:
+                case Opcode.dadd:
                     break;
-                case Opcode.mul:
+                case Opcode.isub:
                     break;
-                case Opcode.div:
+                case Opcode.dsub:
+                    break;
+                case Opcode.imul:
+                    break;
+                case Opcode.dmul:
+                    break;
+                case Opcode.idiv:
                     break;
                 case Opcode.rem:
                     break;

@@ -74,7 +74,7 @@ public class CMMcompiler {
         }
 
         //synTree.traverse(0);
-        synTree.visit();
+        //synTree.visit();
 
         // build CFG
 
@@ -83,8 +83,8 @@ public class CMMcompiler {
 
 
         // generate code
-        //Program program = synTree.genBytecode();
-        //program.serialize();
+        Program program = synTree.genBytecode();
+        program.serialize();
 
         // run code on the virtual machine
 

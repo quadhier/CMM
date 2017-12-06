@@ -5,10 +5,14 @@ import java.util.Hashtable;
 public class Opcode {
 
     // arithmetic
-    public static final byte add = 0x01;
-    public static final byte sub = 0x02;
-    public static final byte mul = 0x03;
-    public static final byte div = 0x04;
+    public static final byte iadd = 0x01;
+    public static final byte dadd = 0x1e;
+    public static final byte isub = 0x02;
+    public static final byte dsub = 0x1f;
+    public static final byte imul = 0x03;
+    public static final byte dmul = 0x20;
+    public static final byte idiv = 0x04;
+    public static final byte ddiv = 0x21;
     public static final byte rem = 0x05;
 
     // stack operation
@@ -49,10 +53,14 @@ public class Opcode {
     public static Hashtable<Byte, String> opcodeLex;
     static {
         opcodeLex = new Hashtable<>();
-        opcodeLex.put(Opcode.add, "add");
-        opcodeLex.put(Opcode.sub, "sub");
-        opcodeLex.put(Opcode.mul, "mul");
-        opcodeLex.put(Opcode.div, "div");
+        opcodeLex.put(Opcode.iadd, "iadd");
+        opcodeLex.put(Opcode.dadd, "dadd");
+        opcodeLex.put(Opcode.isub, "isub");
+        opcodeLex.put(Opcode.dsub, "dsub");
+        opcodeLex.put(Opcode.imul, "imul");
+        opcodeLex.put(Opcode.dmul, "dmul");
+        opcodeLex.put(Opcode.idiv, "idiv");
+        opcodeLex.put(Opcode.ddiv, "ddiv");
         opcodeLex.put(Opcode.rem, "rem");
         opcodeLex.put(Opcode.iconst_0, "iconst_0");
         opcodeLex.put(Opcode.iconst_1, "iconst_1");

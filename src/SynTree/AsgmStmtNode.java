@@ -101,7 +101,7 @@ public class AsgmStmtNode extends SNode {
         Symbol symbol = currentEnv.get(lValIdt.getLexeme());
         int dataType = symbol.getDataType();
         int opdIdx = symbol.getOpdIdx();
-        ArrayList<NnaryExprNode> elemIndex = leftValueExpression.getChildExpressions();
+        ArrayList<NnaryExprNode> elemIndexes = leftValueExpression.getChildExpressions();
         ArrayList<NnaryExprNode> dimLengths = symbol.getDimLengths();
 
         if(assignmentOperator.getTag() != '=') {
@@ -115,11 +115,11 @@ public class AsgmStmtNode extends SNode {
                 // start : generate code to calculate element index
                 int dimIdx = program.getCurrentOpdInx();
                 program.createVal();
-                elemIndex.get(elemIndex.size() - 1).genBytecode(program);
+                elemIndexes.get(elemIndexes.size() - 1).genBytecode(program);
                 program.addCode(Opcode.ipush, dimIdx);
                 program.addCode(Opcode.iconst_1);
                 program.addCode(Opcode.istore);
-                for(int i = elemIndex.size() - 2; i >=0; i--) {
+                for(int i = elemIndexes.size() - 2; i >=0; i--) {
                     // load previously stored dimension length product
                     // multiply it by the current element index and store it back
                     program.addCode(Opcode.ipush, dimIdx); // for load again
@@ -127,12 +127,12 @@ public class AsgmStmtNode extends SNode {
                     program.addCode(Opcode.ipush, dimIdx); // for load
                     program.addCode(Opcode.iload);
                     dimLengths.get(i + 1).genBytecode(program);
-                    program.addCode(Opcode.mul); // calculate reused product
+                    program.addCode(Opcode.imul); // calculate reused product
                     program.addCode(Opcode.istore);
                     program.addCode(Opcode.iload);
-                    elemIndex.get(i).genBytecode(program);
-                    program.addCode(Opcode.mul); // element index * previously stored product
-                    program.addCode(Opcode.add);
+                    elemIndexes.get(i).genBytecode(program);
+                    program.addCode(Opcode.imul); // element index * previously stored product
+                    program.addCode(Opcode.iadd);
                 }
                 program.removeVal(); // remove dimIdx
                 // end : now the stack top is the element index with below unchanged
@@ -143,11 +143,11 @@ public class AsgmStmtNode extends SNode {
 
 
                 // store the array index and element index twice
-                // for load
+                // for store
                 program.addCode(Opcode.ipush, tmpIdx);
                 program.addCode(Opcode.iload);
                 program.addCode(Opcode.ipush, opdIdx);
-                // for store
+                // for load
                 program.addCode(Opcode.ipush, tmpIdx);
                 program.addCode(Opcode.iload);
                 program.addCode(Opcode.ipush, opdIdx);
@@ -155,36 +155,53 @@ public class AsgmStmtNode extends SNode {
                 program.removeVal(); // remove tmpIdx
 
                 // load the value of the left-value-expression onto the operand stack
+                // and calculate
                 if (dataType == Tag.DOUBLE) {
                     program.addCode(Opcode.daload);
-                } else {
-                    program.addCode(Opcode.iaload);
-                }
+                    expression.genBytecode(program);
 
-                expression.genBytecode(program);
-
-                switch (assignmentOperator.getTag()) {
-                    case Tag.PLASN:
-                        program.addCode(Opcode.add);
-                        break;
-                    case Tag.MIASN:
-                        program.addCode(Opcode.sub);
-                        break;
-                    case Tag.MLASN:
-                        program.addCode(Opcode.mul);
-                        break;
-                    case Tag.QTASN:
-                        program.addCode(Opcode.div);
-                        break;
-                    case Tag.RDASN:
-                        program.addCode(Opcode.rem);
-                        break;
-                }
-
-                if (dataType == Tag.DOUBLE) {
+                    switch (assignmentOperator.getTag()) {
+                        case Tag.PLASN:
+                            program.addCode(Opcode.dadd);
+                            break;
+                        case Tag.MIASN:
+                            program.addCode(Opcode.dsub);
+                            break;
+                        case Tag.MLASN:
+                            program.addCode(Opcode.dmul);
+                            break;
+                        case Tag.QTASN:
+                            program.addCode(Opcode.ddiv);
+                            break;
+//                        case Tag.RDASN:
+//                            program.addCode(Opcode.rem);
+//                            break;
+                    }
                     program.addCode(Opcode.dastore);
-                } else {
+
+                } else { // Tag.INT or Tag.DOUBLE
+                    program.addCode(Opcode.iaload);
+                    expression.genBytecode(program);
+
+                    switch (assignmentOperator.getTag()) {
+                        case Tag.PLASN:
+                            program.addCode(Opcode.iadd);
+                            break;
+                        case Tag.MIASN:
+                            program.addCode(Opcode.isub);
+                            break;
+                        case Tag.MLASN:
+                            program.addCode(Opcode.imul);
+                            break;
+                        case Tag.QTASN:
+                            program.addCode(Opcode.idiv);
+                            break;
+//                        case Tag.RDASN:
+//                            program.addCode(Opcode.rem);
+//                            break;
+                    }
                     program.addCode(Opcode.iastore);
+
                 }
 
             } else { // Tag.VARLEXPR
@@ -196,35 +213,52 @@ public class AsgmStmtNode extends SNode {
 
                 if (dataType == Tag.DOUBLE) {
                     program.addCode(Opcode.dload);
-                } else {
-                    program.addCode(Opcode.iload);
-                }
+                    expression.genBytecode(program);
 
-                expression.genBytecode(program);
-
-                switch (assignmentOperator.getTag()) {
-                    case Tag.PLASN:
-                        program.addCode(Opcode.add);
-                        break;
-                    case Tag.MIASN:
-                        program.addCode(Opcode.sub);
-                        break;
-                    case Tag.MLASN:
-                        program.addCode(Opcode.mul);
-                        break;
-                    case Tag.QTASN:
-                        program.addCode(Opcode.div);
-                        break;
-                    case Tag.RDASN:
-                        program.addCode(Opcode.rem);
-                        break;
-                }
-
-                if (dataType == Tag.DOUBLE) {
+                    switch (assignmentOperator.getTag()) {
+                        case Tag.PLASN:
+                            program.addCode(Opcode.dadd);
+                            break;
+                        case Tag.MIASN:
+                            program.addCode(Opcode.dsub);
+                            break;
+                        case Tag.MLASN:
+                            program.addCode(Opcode.dmul);
+                            break;
+                        case Tag.QTASN:
+                            program.addCode(Opcode.ddiv);
+                            break;
+//                        case Tag.RDASN:
+//                            program.addCode(Opcode.rem);
+//                            break;
+                    }
                     program.addCode(Opcode.dstore);
-                } else {
+
+                } else { // Tag.INT or Tag.BOOL
+                    program.addCode(Opcode.iload);
+                    expression.genBytecode(program);
+
+                    switch (assignmentOperator.getTag()) {
+                        case Tag.PLASN:
+                            program.addCode(Opcode.iadd);
+                            break;
+                        case Tag.MIASN:
+                            program.addCode(Opcode.isub);
+                            break;
+                        case Tag.MLASN:
+                            program.addCode(Opcode.imul);
+                            break;
+                        case Tag.QTASN:
+                            program.addCode(Opcode.idiv);
+                            break;
+                        case Tag.RDASN:
+                            program.addCode(Opcode.rem);
+                            break;
+                    }
                     program.addCode(Opcode.istore);
+
                 }
+
             }
 
         } else { // '='
@@ -234,11 +268,11 @@ public class AsgmStmtNode extends SNode {
                 // start : generate code to calculate element index
                 int dimIdx = program.getCurrentOpdInx();
                 program.createVal();
-                elemIndex.get(elemIndex.size() - 1).genBytecode(program);
+                elemIndexes.get(elemIndexes.size() - 1).genBytecode(program);
                 program.addCode(Opcode.ipush, dimIdx);
                 program.addCode(Opcode.iconst_1);
                 program.addCode(Opcode.istore);
-                for(int i = elemIndex.size() - 2; i >=0; i--) {
+                for(int i = elemIndexes.size() - 2; i >=0; i--) {
                     // load previously stored dimension length product
                     // multiply it by the current element index and store it back
                     program.addCode(Opcode.ipush, dimIdx); // for load again
@@ -246,12 +280,12 @@ public class AsgmStmtNode extends SNode {
                     program.addCode(Opcode.ipush, dimIdx); // for load
                     program.addCode(Opcode.iload);
                     dimLengths.get(i + 1).genBytecode(program);
-                    program.addCode(Opcode.mul); // calculate reused product
+                    program.addCode(Opcode.imul); // calculate reused product
                     program.addCode(Opcode.istore);
                     program.addCode(Opcode.iload);
-                    elemIndex.get(i).genBytecode(program);
-                    program.addCode(Opcode.mul); // element index * previously stored product
-                    program.addCode(Opcode.add);
+                    elemIndexes.get(i).genBytecode(program);
+                    program.addCode(Opcode.imul); // element index * previously stored product
+                    program.addCode(Opcode.iadd);
                 }
                 program.removeVal();
                 // end : now the stack top is the element index with below unchanged

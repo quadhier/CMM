@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
 import CMMVM.Program;
 import Lexer.Tag;
 
@@ -47,7 +48,12 @@ public class WriteStmtNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        expression.genBytecode(program);
+        if(expression.getDataType() == Tag.DOUBLE) {
+            program.addCode(Opcode.dwrite);
+        } else {
+            program.addCode(Opcode.iwrite);
+        }
     }
 
 }

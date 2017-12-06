@@ -65,7 +65,7 @@ public class InitlzrNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        // finished in declaration
     }
 
 }
