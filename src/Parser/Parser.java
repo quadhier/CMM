@@ -58,11 +58,12 @@ public class Parser {
         ProgNode progNode = new ProgNode();
         t = peek(1);
         while(true) {
+            if(peek(1) == null) {
+                break;
+            }
             StmtNode stmtNode = statement();
             if(stmtNode != null && stmtNode.getChild() != null) {
                 progNode.addStatement(stmtNode);
-            } else {
-                break;
             }
         }
         return progNode;
@@ -193,6 +194,7 @@ public class Parser {
                             || t.getTag() == Tag.IF || t.getTag() == Tag.WHILE
                             || t.getTag() == Tag.BREAK || t.getTag() == Tag.CONTINUE
                             || t.getTag() == Tag.READ || t.getTag() == Tag.WRITE) {
+                        Failure.addFailure(filepath, t.getLine(), t.getStartpos(), Failure.ERROR, "expected identifer");
                         return null;
                     } else {
                         Failure.addFailure(filepath, t.getLine(), t.getEndpos(), Failure.ERROR, "unexpected token skipped, expected identifer");

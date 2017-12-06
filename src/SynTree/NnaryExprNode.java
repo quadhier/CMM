@@ -8,6 +8,7 @@ import Lexer.Identifer;
 import Lexer.Tag;
 import Lexer.Token;
 import SymTable.Symbol;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode;
 
 import java.util.ArrayList;
 
@@ -578,7 +579,7 @@ public class NnaryExprNode extends SNode {
 
 	@Override
 	public void genBytecode(Program program) {
-/*
+
 		if (tag == Tag.CONSTVAL) {
 			program.addConstant(constVal.getLexeme(), dataType);
 		} else if (tag == Tag.VARLEXPR) {
@@ -587,24 +588,134 @@ public class NnaryExprNode extends SNode {
 			// generate code to push the index onto the operand stack
 			Symbol symbol = currentEnv.get(identifier.getLexeme());
 			int opdIdx = symbol.getOpdIdx();
-			program.addCode(Opcode.iload, opdIdx);
 			program.addCode(Opcode.ipush, opdIdx);
-
-
+            if(dataType == Tag.DOUBLE) {
+                program.addCode(Opcode.dload);
+            } else {
+                program.addCode(Opcode.iload);
+            }
+        // basic variable left-value-expression end
 		} else if (tag == Tag.ARRLEXPR) {
 
-			// if it an array,
-			// generate code to calculate the element index
-			program.addCode(Opcode.iconst_0);
-			for (int i = 0; i < childExpressions.size(); i++) {
-				// for each dimension
-				// index minus 1 then multiplied by dimension length is added to the index
-				// generate code for these operations
+            Symbol symbol = currentEnv.get(identifier.getLexeme());
+            int opdIdx = symbol.getOpdIdx();
+            ArrayList<NnaryExprNode> elemIndexes = childExpressions;
+            ArrayList<NnaryExprNode> dimLengths = symbol.getDimLengths();
 
-			}
+            // start : generate code to calculate element index
+            int dimIdx = program.getCurrentOpdInx();
+            program.createVal();
+            elemIndexes.get(elemIndexes.size() - 1).genBytecode(program);
+            program.addCode(Opcode.ipush, dimIdx);
+            program.addCode(Opcode.iconst_1);
+            program.addCode(Opcode.istore);
+            for(int i = elemIndexes.size() - 2; i >=0; i--) {
+                // load previously stored dimension length product
+                // multiply it by the current element index and store it back
+                program.addCode(Opcode.ipush, dimIdx); // for load again
+                program.addCode(Opcode.ipush, dimIdx); // for store
+                program.addCode(Opcode.ipush, dimIdx); // for load
+                program.addCode(Opcode.iload);
+                dimLengths.get(i + 1).genBytecode(program);
+                program.addCode(Opcode.imul); // calculate reused product
+                program.addCode(Opcode.istore);
+                program.addCode(Opcode.iload);
+                elemIndexes.get(i).genBytecode(program);
+                program.addCode(Opcode.imul); // element index * previously stored product
+                program.addCode(Opcode.iadd);
+            }
+            program.removeVal(); // remove dimIdx
+            // end : now the stack top is the element index with below unchanged
 
+            program.addCode(Opcode.ipush, opdIdx);
+            if(dataType == Tag.DOUBLE) {
+                program.addCode(Opcode.daload);
+            } else {
+                program.addCode(Opcode.iaload);
+            }
+        // array left-value-expression end
+		} else if(tag == Tag.UNARYEXPR) {
+            if(opt.getTag() == '-') {
+                program.addCode(Opcode.iconst_0);
+                childExpressions.get(0).genBytecode(program);
+                if(dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dsub);
+                } else {
+                    program.addCode(Opcode.isub);
+                }
+            } else if(opt.getTag() == '!') {
+                program.addCode(Opcode.iconst_1);
+                childExpressions.get(0).genBytecode(program);
+                program.addCode(Opcode.isub); // 1 - 1, 1 - 0
+            }
+        // unary-expression end
+        } else if(tag == Tag.MLTVEXPR) {
+		    if(dataType == Tag.DOUBLE) {
+		        for(NnaryExprNode nnaryExprNode : childExpressions) {
+		            nnaryExprNode.genBytecode(program);
+		            // generate calculation byte code
+		            if(opt != null) {
+		                if(opt.getTag() == '*') {
+                            program.addCode(Opcode.dmul);
+                        } else if(opt.getTag() == '/') {
+		                    program.addCode(Opcode.ddiv);
+                        }
+                    }
+                }
+            } else {
+                for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    nnaryExprNode.genBytecode(program);
+                    // generate calculation byte code
+                    if(opt != null) {
+                        if(opt.getTag() == '*') {
+                            program.addCode(Opcode.imul);
+                        } else if(opt.getTag() == '/') {
+                            program.addCode(Opcode.idiv);
+                        }
+                    }
 
-		}*/
+                }
+            }
+        // multiplicative-expression end
+        } else if (tag == Tag.ADTVEXPR) {
+            if(dataType == Tag.DOUBLE) {
+                for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    nnaryExprNode.genBytecode(program);
+                    // generate calculation byte code
+                    if(opt != null) {
+                        if(opt.getTag() == '+') {
+                            program.addCode(Opcode.dadd);
+                        } else if(opt.getTag() == '-') {
+                            program.addCode(Opcode.dsub);
+                        }
+                    }
+
+                }
+            } else {
+                for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    nnaryExprNode.genBytecode(program);
+                    // generate calculation byte code
+                    if(opt != null) {
+                        if(opt.getTag() == '+') {
+                            program.addCode(Opcode.iadd);
+                        } else if(opt.getTag() == '-') {
+                            program.addCode(Opcode.isub);
+                        }
+                    }
+                }
+            }
+        // addictive-expression
+        } else if(tag == Tag.RELAEXPR) {
+		    childExpressions.get(0).genBytecode(program);
+		    childExpressions.get(1).genBytecode(program);
+		    switch (tag) {
+                case '<':
+
+                case '>':
+                case Tag.LE:
+                case Tag.GE:
+            }
+        }
 	}
 
 }

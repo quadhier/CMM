@@ -27,6 +27,10 @@ public class Program {
         return codes;
     }
 
+    public int getCodeNum() {
+        return this.codes.size();
+    }
+
     public int getCurrentOpdInx() {
         return currentOpdIdx;
     }
@@ -55,10 +59,12 @@ public class Program {
         if(index == null) {
             index = constantPool.size();
             if(dataType == Tag.DOUBLE) {
-                constantPool.add(Integer.valueOf(literal));
+                constantPool.add(Double.valueOf(literal));
+                constantTable.put(literal, index);
                 addCode(Opcode.dldc, index);
             } else if(dataType == Tag.INT) {
-                constantPool.add(Double.valueOf(literal));
+                constantPool.add(Integer.valueOf(literal));
+                constantTable.put(literal, index);
                 addCode(Opcode.ildc, index);
             } else {
                 if(literal.equals("true")) {

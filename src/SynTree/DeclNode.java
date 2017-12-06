@@ -193,7 +193,7 @@ public class DeclNode extends SNode {
                 program.addCode(Opcode.iconst_1);
                 for (NnaryExprNode nnaryExprNode : dimensionLengths) {
                     nnaryExprNode.genBytecode(program);
-                    program.addCode(Opcode.mul);
+                    program.addCode(Opcode.imul);
                 }
                 // generate code to create an array
                 if(declarationSpecifer.getTag() == Tag.DOUBLE) {
