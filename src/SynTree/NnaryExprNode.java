@@ -627,40 +627,45 @@ public class NnaryExprNode extends SNode {
         } else if(tag == Tag.MLTVEXPR) {
 		    if(dataType == Tag.DOUBLE) {
 		        for(NnaryExprNode nnaryExprNode : childExpressions) {
+		            Token currOpt = nnaryExprNode.getOpt();
 		            nnaryExprNode.genBytecode(program);
 		            // generate calculation byte code
-		            if(opt != null) {
-		                if(opt.getTag() == '*') {
+		            if(currOpt != null) {
+		                if(currOpt.getTag() == '*') {
                             program.addCode(Opcode.dmul);
-                        } else if(opt.getTag() == '/') {
+                        } else if(currOpt.getTag() == '/') {
 		                    program.addCode(Opcode.ddiv);
                         }
                     }
                 }
             } else {
                 for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    Token currOpt = nnaryExprNode.getOpt();
                     nnaryExprNode.genBytecode(program);
                     // generate calculation byte code
-                    if(opt != null) {
-                        if(opt.getTag() == '*') {
+                    if(currOpt != null) {
+                        if(currOpt.getTag() == '*') {
                             program.addCode(Opcode.imul);
-                        } else if(opt.getTag() == '/') {
+                        } else if(currOpt.getTag() == '/') {
                             program.addCode(Opcode.idiv);
+                        } else if(currOpt.getTag() == '%') {
+                            program.addCode(Opcode.ddiv);
                         }
                     }
-
                 }
             }
         // multiplicative-expression end
         } else if (tag == Tag.ADTVEXPR) {
             if(dataType == Tag.DOUBLE) {
                 for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    Token currOpt = nnaryExprNode.getOpt();
                     nnaryExprNode.genBytecode(program);
+
                     // generate calculation byte code
-                    if(opt != null) {
-                        if(opt.getTag() == '+') {
+                    if(currOpt != null) {
+                        if(currOpt.getTag() == '+') {
                             program.addCode(Opcode.dadd);
-                        } else if(opt.getTag() == '-') {
+                        } else if(currOpt.getTag() == '-') {
                             program.addCode(Opcode.dsub);
                         }
                     }
@@ -668,28 +673,49 @@ public class NnaryExprNode extends SNode {
                 }
             } else {
                 for(NnaryExprNode nnaryExprNode : childExpressions) {
+                    Token currOpt = nnaryExprNode.getOpt();
                     nnaryExprNode.genBytecode(program);
                     // generate calculation byte code
-                    if(opt != null) {
-                        if(opt.getTag() == '+') {
+                    if(currOpt != null) {
+                        if(currOpt.getTag() == '+') {
                             program.addCode(Opcode.iadd);
-                        } else if(opt.getTag() == '-') {
+                        } else if(currOpt.getTag() == '-') {
                             program.addCode(Opcode.isub);
                         }
                     }
                 }
             }
-        // addictive-expression
-        } else if(tag == Tag.RELAEXPR) {
+        // addictive-expression end
+        } else { // Tag.RELAEXPR, Tag.EQEXPR, Tag.LGANDEXPR, Tag.LGOREXPR
 		    childExpressions.get(0).genBytecode(program);
 		    childExpressions.get(1).genBytecode(program);
-		    switch (tag) {
-                case '<':
-
-                case '>':
-                case Tag.LE:
-                case Tag.GE:
-            }
+            Token currOpt = childExpressions.get(1).getOpt();
+            switch (currOpt.getTag()) {
+                    case '<':
+                        program.addCode(Opcode.tlt);
+                        break;
+                    case '>':
+                        program.addCode(Opcode.tgt);
+                        break;
+                    case Tag.LE:
+                        program.addCode(Opcode.tle);
+                        break;
+                    case Tag.GE:
+                        program.addCode(Opcode.tge);
+                        break;
+                    case Tag.EQ:
+                        program.addCode(Opcode.teq);
+                        break;
+                    case Tag.NE:
+                        program.addCode(Opcode.tne);
+                        break;
+                    case Tag.AND:
+                        program.addCode(Opcode.and);
+                        break;
+                    case Tag.OR:
+                        program.addCode(Opcode.or);
+                        break;
+                }
         }
 	}
 

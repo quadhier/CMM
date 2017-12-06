@@ -2,6 +2,7 @@ package SynTree;
 
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
@@ -54,7 +55,13 @@ public class JumpStmtNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        if(jumpType.getTag() == Tag.BREAK) {
+            int breakAddr = program.getCodeNum();
+            program.addCode(Opcode.jmp);
+            program.addBreakAddr(breakAddr);
+        } else if(jumpType.getTag() == Tag.CONTINUE) {
+            program.addCode(Opcode.jmp, program.getIterStart());
+        }
     }
 
 }

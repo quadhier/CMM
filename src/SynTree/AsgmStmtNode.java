@@ -66,6 +66,18 @@ public class AsgmStmtNode extends SNode {
                     "inconsistent type, cannot assign bool value to " + (lDataType == Tag.INT ? "int" : "double") + " variable");
         }
 
+        // assignment operator except '=' cannot be applied to boolean type
+        if(assignmentOperator.getTag() != '=' && (leftValueExpression.getDataType() == Tag.BOOL || expression.getDataType() == Tag.BOOL)) {
+            Failure.addFailure(SynTree.getFilepath(), assignmentOperator.getLine(), assignmentOperator.getStartpos(), Failure.ERROR,
+                    "cannot apply '" + assignmentOperator.getLexeme() + "' on bool variable");
+        }
+
+        // '%=' cannot be assigned to double
+        if(assignmentOperator.getTag() != '=' && (leftValueExpression.getDataType() == Tag.DOUBLE || expression.getDataType() == Tag.DOUBLE)) {
+            Failure.addFailure(SynTree.getFilepath(), assignmentOperator.getLine(), assignmentOperator.getStartpos(), Failure.ERROR,
+                    "cannot apply '" + assignmentOperator.getLexeme() + "' on double variable");
+        }
+
         // unable to do boundary check in the compile time
 
     }

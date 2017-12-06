@@ -54,7 +54,7 @@ public class CMMVM {
                 case Opcode.iconst_0:
                     break;
                 case Opcode.iconst_1:
-                        break;
+                    break;
                 case Opcode.ildc:
                     break;
                 case Opcode.dldc:
@@ -81,17 +81,31 @@ public class CMMVM {
                     break;
 
                 // branch operation
-                case Opcode.beq:
+                case Opcode.beo:
                     break;
-                case Opcode.bne:
+                case Opcode.bez:
                     break;
-                case Opcode.bgt:
+                case Opcode.jmp:
                     break;
-                case Opcode.blt:
+
+                // compare operation
+                case Opcode.teq:
                     break;
-                case Opcode.bge:
+                case Opcode.tne:
                     break;
-                case Opcode.ble:
+                case Opcode.tgt:
+                    break;
+                case Opcode.tlt:
+                    break;
+                case Opcode.tge:
+                    break;
+                case Opcode.tle:
+                    break;
+
+                // logical operation
+                case Opcode.and:
+                    break;
+                case Opcode.or:
                     break;
 
                 // io operation
@@ -104,7 +118,7 @@ public class CMMVM {
                 case Opcode.dwrite:
                     break;
                 default:
-                        break;
+                    break;
             }
 
         }

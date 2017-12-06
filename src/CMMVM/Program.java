@@ -4,6 +4,7 @@ import Lexer.Tag;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Stack;
 
 public class Program {
 
@@ -12,11 +13,17 @@ public class Program {
     ArrayList<Bytecode> codes;
     int currentOpdIdx; // only used in code generation
 
+    // prepared for while statement
+    Stack<Integer> iterAddr;
+    Stack<ArrayList<Integer>> breakCollection;
+
     public Program() {
         constantTable = new Hashtable<>();
         constantPool = new ArrayList<>();
         codes = new ArrayList<Bytecode>();
         currentOpdIdx = 0;
+        iterAddr = new Stack<Integer>();
+        breakCollection = new Stack<>();
     }
 
     public ArrayList<Object> getConstantPool() {
@@ -91,13 +98,59 @@ public class Program {
 
     }
 
+    public void backpatch(int codeAddr, int targetAddr) {
+        switch (codes.get(codeAddr).getOpt()) {
+            case Opcode.beo:
+            case Opcode.bez:
+            case Opcode.jmp:
+                codes.get(codeAddr).setOpd(targetAddr);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // backpatch for break-statement
+    public void backpatch(int targetAddr) {
+        ArrayList<Integer> breakList = breakCollection.peek();
+        for(Integer breakAddr : breakList) {
+            codes.get(breakAddr).setOpd(targetAddr);
+        }
+    }
+
+    public void storeIterStart(int iterStart) {
+        iterAddr.push(iterStart);
+    }
+
+    public int getIterStart() {
+        return iterAddr.peek();
+    }
+
+    public void removreIterStart() {
+        iterAddr.pop();
+    }
+
+    public void createBreakList() {
+        breakCollection.push(new ArrayList<Integer>());
+    }
+
+    public void addBreakAddr(int breakAddr) {
+        breakCollection.peek().add(breakAddr);
+    }
+
+    public void removreBreakList() {
+        breakCollection.pop();
+    }
+
     public void serialize() {
-        for(Bytecode bytecode : codes) {
+        for(int i = 0; i < codes.size(); i++) {
+            Bytecode bytecode = codes.get(i);
             byte opt = bytecode.getOpt();
-            if(opt == Opcode.ildc || opt == Opcode.dldc || opt == Opcode.ipush) {
-                System.out.println(Opcode.opcodeLex.get(opt) + " " + bytecode.getOpd());
+            if(opt == Opcode.ildc || opt == Opcode.dldc || opt == Opcode.ipush
+                    || opt == Opcode.bez || opt == Opcode.beo || opt == Opcode.jmp) {
+                System.out.println(i + ": " + Opcode.opcodeLex.get(opt) + " " + bytecode.getOpd());
             } else if(opt == Opcode.newarray) {
-                System.out.print("newarray ");
+                System.out.print(i + ": newarray ");
                 switch (bytecode.getOpd()) {
                     case Tag.DOUBLE:
                         System.out.println("double");
@@ -107,7 +160,7 @@ public class Program {
                         break;
                 }
             } else {
-                System.out.println(Opcode.opcodeLex.get(opt));
+                System.out.println(i + ": " + Opcode.opcodeLex.get(opt));
             }
 
         }

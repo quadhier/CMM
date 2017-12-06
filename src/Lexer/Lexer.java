@@ -62,6 +62,14 @@ public class Lexer {
                 int startpos = pos + 1;
                 extract(1);
                 c = peek(1);
+
+                // inserted for /=
+                // ungracefully :(
+                if(c == '=') {
+                    extract(1);
+                    return new Token(Tag.QTASN, line, startline, startpos);
+                }
+
                 // single line comment
                 if (c == '/') {
                     while (c != '\n') {

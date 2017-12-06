@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
@@ -66,7 +67,22 @@ public class IterStmtNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
+        int targetAddr1 = program.getCodeNum();
 
+        program.storeIterStart(targetAddr1);
+        program.createBreakList();
+
+        expression.genBytecode(program);
+        int codeAddr = program.getCodeNum();
+        program.addCode(Opcode.bez);
+        statement.genBytecode(program);
+        program.addCode(Opcode.jmp, targetAddr1);
+        int targetAddr2 = program.getCodeNum();
+        program.backpatch(codeAddr, targetAddr2);
+
+        program.backpatch(targetAddr2);
+        program.removreIterStart();
+        program.removreBreakList();
     }
 
 }

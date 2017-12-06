@@ -2,48 +2,64 @@ package CMMVM;
 
 import java.util.Hashtable;
 
+// %s/= \zs\d\+\ze//g
+// let n = 0 | g/= \zs\ze;/s//\=n/ | let n+=1 
+
+
 public class Opcode {
 
     // arithmetic
-    public static final byte iadd = 0x01;
-    public static final byte dadd = 0x1e;
-    public static final byte isub = 0x02;
-    public static final byte dsub = 0x1f;
-    public static final byte imul = 0x03;
-    public static final byte dmul = 0x20;
-    public static final byte idiv = 0x04;
-    public static final byte ddiv = 0x21;
-    public static final byte rem = 0x05;
+    public static final byte iadd = 0;
+    public static final byte dadd = 1;
+    public static final byte isub = 2;
+    public static final byte dsub = 3;
+    public static final byte imul = 4;
+    public static final byte dmul = 5;
+    public static final byte idiv = 6;
+    public static final byte ddiv = 7;
+    public static final byte rem = 8;
 
     // stack operation
-    public static final byte iconst_0 = 0x06;
-    public static final byte iconst_1 = 0x07;
-    public static final byte ildc = 0x08;
-    public static final byte dldc = 0x09;
-    public static final byte ipush = 0x0a;
-    public static final byte iload = 0x0b;
-    public static final byte dload = 0x0c;
-    public static final byte iaload = 0x0d;
-    public static final byte daload = 0x0e;
-    public static final byte newarray = 0x0f;
-    public static final byte istore = 0x10;
-    public static final byte dstore = 0x11;
-    public static final byte iastore = 0x12;
-    public static final byte dastore = 0x13;
+    public static final byte iconst_0 = 9;
+    public static final byte iconst_1 = 10;
+    public static final byte ildc = 11;
+    public static final byte dldc = 12;
+    public static final byte ipush = 13;
+    public static final byte iload = 14;
+    public static final byte dload = 15;
+    public static final byte iaload = 16;
+    public static final byte daload = 17;
+    public static final byte newarray = 18;
+    public static final byte istore = 19;
+    public static final byte dstore = 20;
+    public static final byte iastore = 21;
+    public static final byte dastore = 22;
 
     // branch operation
-    public static final byte beq = 0x14; // branch if equal
-    public static final byte bne = 0x15; // branch if not equal
-    public static final byte bgt = 0x16; // branch if greater than
-    public static final byte blt = 0x17; // branch if less than
-    public static final byte bge = 0x18; // branch if greater than or equal to
-    public static final byte ble = 0x19; // branch if less than or equal to
+    public static final byte bez = 23; // branch if equal zero
+    public static final byte beo = 24; // branch if equal one
+    public static final byte jmp = 25; // branch if equal one
 
-    // io
-    public static final byte iread = 0x1a;
-    public static final byte dread = 0x1b;
-    public static final byte iwrite = 0x1c;
-    public static final byte dwrite = 0x1d;
+
+
+    // compare operation
+    public static final byte teq = 26;
+    public static final byte tne = 27;
+    public static final byte tgt = 28;
+    public static final byte tlt = 29;
+    public static final byte tge = 30;
+    public static final byte tle = 31;
+
+    // logical operation
+    public static final byte and = 32;
+    public static final byte or = 33;
+
+
+    // io operation
+    public static final byte iread = 34;
+    public static final byte dread = 35;
+    public static final byte iwrite = 36;
+    public static final byte dwrite = 37;
 
     private Opcode() {
 
@@ -76,12 +92,17 @@ public class Opcode {
         opcodeLex.put(Opcode.dstore, "dstore");
         opcodeLex.put(Opcode.iastore, "iastore");
         opcodeLex.put(Opcode.dastore, "dastore");
-        opcodeLex.put(Opcode.beq, "beq");
-        opcodeLex.put(Opcode.bne, "bne");
-        opcodeLex.put(Opcode.bgt, "bgt");
-        opcodeLex.put(Opcode.blt, "blt");
-        opcodeLex.put(Opcode.bge, "bge");
-        opcodeLex.put(Opcode.ble, "ble");
+        opcodeLex.put(Opcode.bez, "bez"); // unary
+        opcodeLex.put(Opcode.beo, "beo"); // unary
+        opcodeLex.put(Opcode.jmp, "jmp"); // unary
+        opcodeLex.put(Opcode.teq, "teq");
+        opcodeLex.put(Opcode.tne, "tne");
+        opcodeLex.put(Opcode.tgt, "tgt");
+        opcodeLex.put(Opcode.tlt, "tlt");
+        opcodeLex.put(Opcode.tge, "tge");
+        opcodeLex.put(Opcode.tle, "tle");
+        opcodeLex.put(Opcode.and, "and");
+        opcodeLex.put(Opcode.or, "or");
         opcodeLex.put(Opcode.iread, "iread");
         opcodeLex.put(Opcode.dread, "dread");
         opcodeLex.put(Opcode.iwrite, "iwrite");

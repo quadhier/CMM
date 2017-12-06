@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Bytecode;
+import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
@@ -76,7 +77,17 @@ public class SeleStmtNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        expression.genBytecode(program);
+        int codeAddr1 = program.getCodeNum();
+        program.addCode(Opcode.bez);
+        ifStatement.genBytecode(program);
+        int codeAddr2 = program.getCodeNum();
+        program.addCode(Opcode.jmp);
+        int targetAddr1 = program.getCodeNum();
+        elseStatement.genBytecode(program);
+        int targetAddr2 = program.getCodeNum();
+        program.backpatch(codeAddr1, targetAddr1);
+        program.backpatch(codeAddr2, targetAddr2);
     }
 
 }
