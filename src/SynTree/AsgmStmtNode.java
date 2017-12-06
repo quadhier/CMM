@@ -8,6 +8,7 @@ import Lexer.Identifer;
 import Lexer.Tag;
 import Lexer.Token;
 import SymTable.Symbol;
+import sun.dc.pr.PRError;
 
 import java.util.ArrayList;
 
@@ -97,46 +98,186 @@ public class AsgmStmtNode extends SNode {
         // and push them onto the stack
         int lValTag = leftValueExpression.getTag();
         Token lValIdt = leftValueExpression.getIdentifier();
-        int exprTag = expression.getTag();
-        if(lValTag == Tag.ARRLEXPR) {
-            Symbol symbol = currentEnv.get(lValIdt.getLexeme());
-            int opdIdx = symbol.getOpdIdx();
-            program.addCode(Opcode.ipush, opdIdx);
+        Symbol symbol = currentEnv.get(lValIdt.getLexeme());
+        int dataType = symbol.getDataType();
+        int opdIdx = symbol.getOpdIdx();
+        ArrayList<NnaryExprNode> elemIndex = leftValueExpression.getChildExpressions();
+        ArrayList<NnaryExprNode> dimLengths = symbol.getDimLengths();
 
-            // generate code to calculate element index
+        if(assignmentOperator.getTag() != '=') {
 
+            if(lValTag == Tag.ARRLEXPR) {
+                // create a tmp variable to store the array element index
+                int tmpIdx = program.getCurrentOpdInx();
+                program.createVal();
+                program.addCode(Opcode.ipush, tmpIdx);
 
-        } else {
-            Symbol symbol = currentEnv.get(leftValueExpression.getIdentifier().getLexeme());
-            int opdIdx = symbol.getOpdIdx();
-            program.addCode(Opcode.ipush, opdIdx);
-
-        }
-
-        // generate bytecode for calculating the expression
-        expression.genBytecode(program);
-        
-
-
-        // from stack top towards bottom,
-        // expression result, element index, array operand index
-        if(lValTag == Tag.ARRLEXPR) {
-
-            if(exprTag == Tag.DOUBLE) {
-                program.addCode(Opcode.dastore);
-            } else { // int or bool
-                program.addCode(Opcode.iastore);
-            }
-        } else { // Tag.VARLEXPR
-
-            if(exprTag == Tag.DOUBLE) {
-                program.addCode(Opcode.dstore);
-            } else {
+                // start : generate code to calculate element index
+                int dimIdx = program.getCurrentOpdInx();
+                program.createVal();
+                elemIndex.get(elemIndex.size() - 1).genBytecode(program);
+                program.addCode(Opcode.ipush, dimIdx);
+                program.addCode(Opcode.iconst_1);
                 program.addCode(Opcode.istore);
+                for(int i = elemIndex.size() - 2; i >=0; i--) {
+                    // load previously stored dimension length product
+                    // multiply it by the current element index and store it back
+                    program.addCode(Opcode.ipush, dimIdx); // for load again
+                    program.addCode(Opcode.ipush, dimIdx); // for store
+                    program.addCode(Opcode.ipush, dimIdx); // for load
+                    program.addCode(Opcode.iload);
+                    dimLengths.get(i + 1).genBytecode(program);
+                    program.addCode(Opcode.mul); // calculate reused product
+                    program.addCode(Opcode.istore);
+                    program.addCode(Opcode.iload);
+                    elemIndex.get(i).genBytecode(program);
+                    program.addCode(Opcode.mul); // element index * previously stored product
+                    program.addCode(Opcode.add);
+                }
+                program.removeVal(); // remove dimIdx
+                // end : now the stack top is the element index with below unchanged
+
+                // store the array element index
+                // in the local variable area at tmpIdx
+                program.addCode(Opcode.istore);
+
+
+                // store the array index and element index twice
+                // for load
+                program.addCode(Opcode.ipush, tmpIdx);
+                program.addCode(Opcode.iload);
+                program.addCode(Opcode.ipush, opdIdx);
+                // for store
+                program.addCode(Opcode.ipush, tmpIdx);
+                program.addCode(Opcode.iload);
+                program.addCode(Opcode.ipush, opdIdx);
+
+                program.removeVal(); // remove tmpIdx
+
+                // load the value of the left-value-expression onto the operand stack
+                if (dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.daload);
+                } else {
+                    program.addCode(Opcode.iaload);
+                }
+
+                expression.genBytecode(program);
+
+                switch (assignmentOperator.getTag()) {
+                    case Tag.PLASN:
+                        program.addCode(Opcode.add);
+                        break;
+                    case Tag.MIASN:
+                        program.addCode(Opcode.sub);
+                        break;
+                    case Tag.MLASN:
+                        program.addCode(Opcode.mul);
+                        break;
+                    case Tag.QTASN:
+                        program.addCode(Opcode.div);
+                        break;
+                    case Tag.RDASN:
+                        program.addCode(Opcode.rem);
+                        break;
+                }
+
+                if (dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dastore);
+                } else {
+                    program.addCode(Opcode.iastore);
+                }
+
+            } else { // Tag.VARLEXPR
+
+                // for load
+                program.addCode(Opcode.ipush, opdIdx);
+                // for store
+                program.addCode(Opcode.ipush, opdIdx);
+
+                if (dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dload);
+                } else {
+                    program.addCode(Opcode.iload);
+                }
+
+                expression.genBytecode(program);
+
+                switch (assignmentOperator.getTag()) {
+                    case Tag.PLASN:
+                        program.addCode(Opcode.add);
+                        break;
+                    case Tag.MIASN:
+                        program.addCode(Opcode.sub);
+                        break;
+                    case Tag.MLASN:
+                        program.addCode(Opcode.mul);
+                        break;
+                    case Tag.QTASN:
+                        program.addCode(Opcode.div);
+                        break;
+                    case Tag.RDASN:
+                        program.addCode(Opcode.rem);
+                        break;
+                }
+
+                if (dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dstore);
+                } else {
+                    program.addCode(Opcode.istore);
+                }
             }
+
+        } else { // '='
+
+            if(lValTag == Tag.ARRLEXPR) {
+
+                // start : generate code to calculate element index
+                int dimIdx = program.getCurrentOpdInx();
+                program.createVal();
+                elemIndex.get(elemIndex.size() - 1).genBytecode(program);
+                program.addCode(Opcode.ipush, dimIdx);
+                program.addCode(Opcode.iconst_1);
+                program.addCode(Opcode.istore);
+                for(int i = elemIndex.size() - 2; i >=0; i--) {
+                    // load previously stored dimension length product
+                    // multiply it by the current element index and store it back
+                    program.addCode(Opcode.ipush, dimIdx); // for load again
+                    program.addCode(Opcode.ipush, dimIdx); // for store
+                    program.addCode(Opcode.ipush, dimIdx); // for load
+                    program.addCode(Opcode.iload);
+                    dimLengths.get(i + 1).genBytecode(program);
+                    program.addCode(Opcode.mul); // calculate reused product
+                    program.addCode(Opcode.istore);
+                    program.addCode(Opcode.iload);
+                    elemIndex.get(i).genBytecode(program);
+                    program.addCode(Opcode.mul); // element index * previously stored product
+                    program.addCode(Opcode.add);
+                }
+                program.removeVal();
+                // end : now the stack top is the element index with below unchanged
+
+                program.addCode(Opcode.ipush, opdIdx);
+                expression.genBytecode(program);
+
+                if(dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dastore);
+                } else {
+                    program.addCode(Opcode.iastore);
+                }
+            } else {
+
+                program.addCode(Opcode.ipush, opdIdx);
+                expression.genBytecode(program);
+
+                if(dataType == Tag.DOUBLE) {
+                    program.addCode(Opcode.dstore);
+                } else {
+                    program.addCode(Opcode.istore);
+                }
+            }
+
+
         }
-
-
 
     }
 }

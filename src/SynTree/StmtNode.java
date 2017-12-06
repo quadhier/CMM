@@ -53,7 +53,7 @@ public class StmtNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        child.genBytecode(program);
     }
 
 }

@@ -45,13 +45,23 @@ public class CMMVM {
                     break;
 
                 // stack operation
+                case Opcode.iconst_0:
+                    break;
+                case Opcode.iconst_1:
+                        break;
+                case Opcode.ildc:
+                    break;
+                case Opcode.dldc:
+                    break;
                 case Opcode.ipush:
                     break;
                 case Opcode.iload:
                     break;
                 case Opcode.dload:
                     break;
-                case Opcode.aload:
+                case Opcode.iaload:
+                    break;
+                case Opcode.daload:
                     break;
                 case Opcode.newarray:
                     break;

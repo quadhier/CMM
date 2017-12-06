@@ -185,7 +185,10 @@ public class DeclNode extends SNode {
             for(InitlzrNode initlzrNode : initializers) {
                 // store the operand index in the symbol table
                 Symbol symbol = currentEnv.get(initlzrNode.getIdentifer().getLexeme());
-                symbol.setOpdIdx(program.getCurrentOpdInx());
+                int opdIdx = program.getCurrentOpdInx();
+                symbol.setOpdIdx(opdIdx);
+                program.createVal();
+                program.addCode(Opcode.ipush, opdIdx);
                 // generate code to calculate the length of the array
                 program.addCode(Opcode.iconst_1);
                 for (NnaryExprNode nnaryExprNode : dimensionLengths) {
@@ -209,6 +212,7 @@ public class DeclNode extends SNode {
                 Symbol symbol = currentEnv.get(initlzrNode.getIdentifer().getLexeme());
                 int opdIdx = program.getCurrentOpdInx();
                 symbol.setOpdIdx(opdIdx);
+                program.createVal();
                 program.addCode(Opcode.ipush, opdIdx);
 
                 NnaryExprNode nnaryExprNode = initlzrNode.getExpression();

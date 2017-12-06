@@ -1,10 +1,13 @@
 import Buffer.CharBuffer;
 import Buffer.TokenBuffer;
+import CMMVM.Program;
+import CMMVM.Opcode;
 import Failure.Failure;
 import Lexer.*;
 import Parser.Parser;
 import SynTree.SNode;
 import SynTree.SynTree;
+
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -70,7 +73,7 @@ public class CMMcompiler {
             return;
         }
 
-        synTree.traverse(0);
+        //synTree.traverse(0);
         synTree.visit();
 
         // build CFG
@@ -80,7 +83,8 @@ public class CMMcompiler {
 
 
         // generate code
-
+        //Program program = synTree.genBytecode();
+        //program.serialize();
 
         // run code on the virtual machine
 

@@ -56,7 +56,9 @@ public class ProgNode extends SNode {
 
     @Override
     public void genBytecode(Program program) {
-
+        for (StmtNode stmtNode : statements) {
+            stmtNode.genBytecode(program);
+        }
     }
 
 }

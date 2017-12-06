@@ -10,25 +10,13 @@ public class Program {
     Hashtable<String, Integer> constantTable; // record the constant pool
     ArrayList<Object> constantPool;
     ArrayList<Bytecode> codes;
-    int currentOpdInx; // only used in code generation
+    int currentOpdIdx; // only used in code generation
 
     public Program() {
         constantTable = new Hashtable<>();
         constantPool = new ArrayList<>();
         codes = new ArrayList<Bytecode>();
-        currentOpdInx = 0;
-    }
-
-    private boolean isLocalValInc(byte Operand) {
-        switch (Operand) {
-            case Opcode.istore:
-            case Opcode.dstore:
-            case Opcode.iastore:
-            case Opcode.dastore:
-                return true;
-            default:
-                return false;
-        }
+        currentOpdIdx = 0;
     }
 
     public ArrayList<Object> getConstantPool() {
@@ -40,23 +28,25 @@ public class Program {
     }
 
     public int getCurrentOpdInx() {
-        return currentOpdInx;
+        return currentOpdIdx;
     }
 
     public void addCode(byte opt, int opd) {
         int offset = codes.size();
         codes.add(new Bytecode(offset, opt, opd));
-        if(isLocalValInc(opt)) {
-            currentOpdInx++;
-        }
     }
 
     public void addCode(byte opt) {
         int offset = codes.size();
         codes.add(new Bytecode(offset, opt));
-        if(isLocalValInc(opt)) {
-            currentOpdInx++;
-        }
+    }
+
+    public void createVal() {
+        currentOpdIdx++;
+    }
+
+    public void removeVal() {
+        currentOpdIdx--;
     }
 
     public void addConstant(String literal, int dataType) {
@@ -94,6 +84,29 @@ public class Program {
         }
 
     }
+
+    public void serialize() {
+        for(Bytecode bytecode : codes) {
+            byte opt = bytecode.getOpt();
+            if(opt == Opcode.ildc || opt == Opcode.dldc || opt == Opcode.ipush) {
+                System.out.println(Opcode.opcodeLex.get(opt) + " " + bytecode.getOpd());
+            } else if(opt == Opcode.newarray) {
+                System.out.print("newarray ");
+                switch (bytecode.getOpd()) {
+                    case Tag.DOUBLE:
+                        System.out.println("double");
+                        break;
+                    default:
+                        System.out.println("int");
+                        break;
+                }
+            } else {
+                System.out.println(Opcode.opcodeLex.get(opt));
+            }
+
+        }
+    }
+
 
 }
 

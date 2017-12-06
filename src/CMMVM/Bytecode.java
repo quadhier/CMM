@@ -25,7 +25,7 @@ public class Bytecode {
         return offset;
     }
 
-    public int getOpt() {
+    public byte getOpt() {
         return opt;
     }
 
