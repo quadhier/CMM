@@ -39,13 +39,13 @@ public class ReadStmtNode extends SNode {
 		try {
 			switch (leftValueExpression.getDataType()) {
 				case Tag.INT:
-					Integer.valueOf(input);
+					leftValueExpression.setValue(Integer.valueOf(input));
 					break;
 				case Tag.BOOL:
-					Boolean.valueOf(input);
+					leftValueExpression.setValue(Boolean.valueOf(input));
 					break;
 				case Tag.DOUBLE:
-					Double.valueOf(input);
+					leftValueExpression.setValue(Double.valueOf(input));
 					break;
 			}
 		} catch (Exception e){
