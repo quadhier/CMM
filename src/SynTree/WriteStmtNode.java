@@ -28,6 +28,8 @@ public class WriteStmtNode extends SNode {
 
     @Override
     public void visit() {
+        if (currentEnv.isContinueLoop()||currentEnv.isBreakLoop())
+            return;
         System.out.println(expression.getValue());
     }
 

@@ -1,6 +1,5 @@
 package SynTree;
 
-import CMMVM.Bytecode;
 import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
@@ -8,7 +7,6 @@ import Lexer.Identifer;
 import Lexer.Tag;
 import Lexer.Token;
 import SymTable.Symbol;
-import sun.dc.pr.PRError;
 
 import java.util.ArrayList;
 
@@ -82,10 +80,68 @@ public class AsgmStmtNode extends SNode {
 
     }
 
-    @Override
-    public void visit() {
-
-    }
+	@Override
+	public void visit() {
+    	if (currentEnv.isContinueLoop()||currentEnv.isBreakLoop())
+    		return;
+		switch (leftValueExpression.getDataType()) {
+			case Tag.INT:
+				switch (assignmentOperator.getTag()) {
+					case '=':
+						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+						break;
+					case Tag.PLASN:
+						leftValueExpression.setValue((int) leftValueExpression.getValue() + (int) expression.getValue());
+						break;
+					case Tag.MIASN:
+						leftValueExpression.setValue((int) leftValueExpression.getValue() - (int) expression.getValue());
+						break;
+					case Tag.MLASN:
+						leftValueExpression.setValue((int) leftValueExpression.getValue() * (int) expression.getValue());
+						break;
+					case Tag.QTASN:
+						if ((int) expression.getValue() == 0) {
+							System.err.println("Runtime Error: divided by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
+							System.exit(1);
+						}
+						leftValueExpression.setValue((int) leftValueExpression.getValue() / (int) expression.getValue());
+						break;
+					case Tag.RDASN:
+						if ((int) expression.getValue() == 0) {
+							System.err.println("Runtime Error: mod by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
+							System.exit(1);
+						}
+						leftValueExpression.setValue((int) leftValueExpression.getValue() % (int) expression.getValue());
+						break;
+				}
+				break;
+			case Tag.DOUBLE:
+				switch (assignmentOperator.getTag()) {
+					case '=':
+						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+						break;
+					case Tag.PLASN:
+						leftValueExpression.setValue((double) leftValueExpression.getValue() + (double) expression.getValue());
+						break;
+					case Tag.MIASN:
+						leftValueExpression.setValue((double) leftValueExpression.getValue() - (double) expression.getValue());
+						break;
+					case Tag.MLASN:
+						leftValueExpression.setValue((double) leftValueExpression.getValue() * (double) expression.getValue());
+						break;
+					case Tag.QTASN:
+						if ((double) expression.getValue() == 0) {
+							System.err.println("Runtime Error: divided by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
+							System.exit(1);
+						}
+						leftValueExpression.setValue((double) leftValueExpression.getValue() / (double) expression.getValue());
+						break;
+				}
+				break;
+			case Tag.BOOL:
+				leftValueExpression.setValue((boolean)expression.getValue());
+		}
+	}
 
     @Override
     public void traverse(int blank) {

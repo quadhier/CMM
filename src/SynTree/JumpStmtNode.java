@@ -7,6 +7,7 @@ import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
 import Lexer.Token;
+import SymTable.Env;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,31 @@ public class JumpStmtNode extends SNode {
 
     @Override
     public void visit() {
-
+        if (currentEnv.isContinueLoop()||currentEnv.isBreakLoop())
+            return;
+        Env t;
+        switch (jumpType.getTag()){
+            case Tag.CONTINUE:
+                t =currentEnv;
+                while (t.isInLoop()){
+                    t.setContinueLoop(true);
+                    if (t.getPrev()!=null)
+                        t = t.getPrev();
+                    else
+                        break;
+                }
+                break;
+            case Tag.BREAK:
+                t =currentEnv;
+                while (t.isInLoop()){
+                    t.setBreakLoop(true);
+                    if (t.getPrev()!=null)
+                        t = t.getPrev();
+                    else
+                        break;
+                }
+                break;
+        }
     }
 
     @Override

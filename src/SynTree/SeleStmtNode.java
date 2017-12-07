@@ -35,6 +35,14 @@ public class SeleStmtNode extends SNode {
         this.elseStatement = elseStatement;
     }
 
+    public StmtNode getIfStatement() {
+        return ifStatement;
+    }
+
+    public StmtNode getElseStatement() {
+        return elseStatement;
+    }
+
     @Override
     public void checkAndBuild() {
 
@@ -54,7 +62,12 @@ public class SeleStmtNode extends SNode {
 
     @Override
     public void visit() {
-
+        if (currentEnv.isContinueLoop() || currentEnv.isBreakLoop())
+            return;
+        if((boolean)expression.getValue()){
+            ifStatement.visit();
+        }else if (elseStatement!=null)
+            elseStatement.visit();
     }
 
     @Override
