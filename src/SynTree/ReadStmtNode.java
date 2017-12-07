@@ -1,6 +1,7 @@
 package SynTree;
 
 import CMMVM.Opcode;
+import CMMVM.Operand;
 import CMMVM.Program;
 import Lexer.Tag;
 import Lexer.Token;
@@ -126,8 +127,11 @@ public class ReadStmtNode extends SNode {
 			if (dataType == Tag.DOUBLE) {
 				program.addCode(Opcode.dread);
 				program.addCode(Opcode.dstore);
-			} else {
+			} else if (dataType == Tag.INT){
 				program.addCode(Opcode.iread);
+				program.addCode(Opcode.istore);
+			} else {
+				program.addCode(Opcode.bread);
 				program.addCode(Opcode.istore);
 			}
 

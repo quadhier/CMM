@@ -60,9 +60,6 @@ public class CMMcompiler {
 //        Failure.reportFailure();
 
 
-
-
-
         Parser parser = new Parser(filepath, reader);
         // get parse tree
         SNode root = parser.parse();
@@ -88,14 +85,12 @@ public class CMMcompiler {
 
 
         // generate code
-        //Program program = synTree.genBytecode();
+        Program program = synTree.genBytecode();
         //program.serialize();
 
         // run code on the virtual machine
         CMMVM cmmvm = new CMMVM(program);
         cmmvm.execute();
-
-
     }
 
 

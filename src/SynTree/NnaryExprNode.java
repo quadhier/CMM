@@ -407,10 +407,10 @@ public class NnaryExprNode extends SNode {
 									d *= tmpValue;
 									break;
 								case '/':
-									if (tmpValue == 0) {
-										System.err.println("Runtime Error: divided by 0 on line " + startLine + ", position " + startPos);
-										System.exit(1);
-									}
+//									if (tmpValue == 0) {
+//										System.err.println("Runtime Error: divided by 0 on line " + startLine + ", position " + startPos);
+//										System.exit(1);
+//									}
 									d /= tmpValue;
 									break;
 							}
@@ -713,9 +713,12 @@ public class NnaryExprNode extends SNode {
         // addictive-expression end
         } else { // Tag.RELAEXPR, Tag.EQEXPR, Tag.LGANDEXPR, Tag.LGOREXPR
 		    childExpressions.get(0).genBytecode(program);
-		    childExpressions.get(1).genBytecode(program);
-            Token currOpt = childExpressions.get(1).getOpt();
-            switch (currOpt.getTag()) {
+            for(NnaryExprNode nnaryExprNode : childExpressions) {
+                if(nnaryExprNode.getOpt() == null)
+                    continue;
+                nnaryExprNode.genBytecode(program);
+                Token currOpt = nnaryExprNode.getOpt();
+                switch (currOpt.getTag()) {
                     case '<':
                         program.addCode(Opcode.tlt);
                         break;
@@ -741,6 +744,8 @@ public class NnaryExprNode extends SNode {
                         program.addCode(Opcode.or);
                         break;
                 }
+            }
+
         }
 	}
 

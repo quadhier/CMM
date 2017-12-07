@@ -58,8 +58,11 @@ public class Opcode {
     // io operation
     public static final byte iread = 34;
     public static final byte dread = 35;
-    public static final byte iwrite = 36;
-    public static final byte dwrite = 37;
+    public static final byte bread = 36;
+    public static final byte iwrite = 37;
+    public static final byte dwrite = 38;
+    public static final byte bwrite = 39;
+
 
     private Opcode() {
 
@@ -105,8 +108,10 @@ public class Opcode {
         opcodeLex.put(Opcode.or, "or");
         opcodeLex.put(Opcode.iread, "iread");
         opcodeLex.put(Opcode.dread, "dread");
+        opcodeLex.put(Opcode.dread, "bread");
         opcodeLex.put(Opcode.iwrite, "iwrite");
         opcodeLex.put(Opcode.dwrite, "dwrite");
+        opcodeLex.put(Opcode.dwrite, "bwrite");
     }
 
 }

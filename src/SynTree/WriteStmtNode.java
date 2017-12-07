@@ -53,8 +53,10 @@ public class WriteStmtNode extends SNode {
         expression.genBytecode(program);
         if(expression.getDataType() == Tag.DOUBLE) {
             program.addCode(Opcode.dwrite);
-        } else {
+        } else if(expression.getDataType() == Tag.INT) {
             program.addCode(Opcode.iwrite);
+        } else {
+            program.addCode(Opcode.bwrite);
         }
     }
 

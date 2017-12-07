@@ -71,7 +71,7 @@ public class AsgmStmtNode extends SNode {
         }
 
         // '%=' cannot be assigned to double
-        if(assignmentOperator.getTag() != '=' && (leftValueExpression.getDataType() == Tag.DOUBLE || expression.getDataType() == Tag.DOUBLE)) {
+        if(assignmentOperator.getTag() == Tag.RDASN && (leftValueExpression.getDataType() == Tag.DOUBLE || expression.getDataType() == Tag.DOUBLE)) {
             Failure.addFailure(SynTree.getFilepath(), assignmentOperator.getLine(), assignmentOperator.getStartpos(), Failure.ERROR,
                     "cannot apply '" + assignmentOperator.getLexeme() + "' on double variable");
         }
@@ -117,25 +117,46 @@ public class AsgmStmtNode extends SNode {
 				break;
 			case Tag.DOUBLE:
 				switch (assignmentOperator.getTag()) {
-					case '=':
+
+                    case '=':
 						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
 						break;
 					case Tag.PLASN:
-						leftValueExpression.setValue((double) leftValueExpression.getValue() + (double) expression.getValue());
+						leftValueExpression.setValue((double) (int) leftValueExpression.getValue() + (double) (int) expression.getValue());
 						break;
 					case Tag.MIASN:
-						leftValueExpression.setValue((double) leftValueExpression.getValue() - (double) expression.getValue());
+						leftValueExpression.setValue((double) (int) leftValueExpression.getValue() - (double) (int) expression.getValue());
 						break;
 					case Tag.MLASN:
-						leftValueExpression.setValue((double) leftValueExpression.getValue() * (double) expression.getValue());
+						leftValueExpression.setValue((double) (int) leftValueExpression.getValue() * (double) (int) expression.getValue());
 						break;
 					case Tag.QTASN:
-						if ((double) expression.getValue() == 0) {
-							System.err.println("Runtime Error: divided by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
-							System.exit(1);
-						}
-						leftValueExpression.setValue((double) leftValueExpression.getValue() / (double) expression.getValue());
+//						if ((Integer) expression.getValue() == 0) {
+//							System.err.println("Runtime Error: divided by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
+//							System.exit(1);
+//						}
+						leftValueExpression.setValue((double) (int) leftValueExpression.getValue() / (double) (int) expression.getValue());
 						break;
+
+//					case '=':
+//						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+//						break;
+//					case Tag.PLASN:
+//						leftValueExpression.setValue((double) leftValueExpression.getValue() + (double) expression.getValue());
+//						break;
+//					case Tag.MIASN:
+//						leftValueExpression.setValue((double) leftValueExpression.getValue() - (double) expression.getValue());
+//						break;
+//					case Tag.MLASN:
+//						leftValueExpression.setValue((double) leftValueExpression.getValue() * (double) expression.getValue());
+//						break;
+//					case Tag.QTASN:
+//						if ((Integer) expression.getValue() == 0) {
+//							System.err.println("Runtime Error: divided by 0 on line " + expression.getStartLine() + ", position " + expression.getStartPos());
+//							System.exit(1);
+//						}
+//						leftValueExpression.setValue((double) leftValueExpression.getValue() / (double) expression.getValue());
+//						break;
 				}
 				break;
 			case Tag.BOOL:

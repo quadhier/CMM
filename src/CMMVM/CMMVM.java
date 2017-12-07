@@ -3,6 +3,7 @@ package CMMVM;
 import Lexer.Tag;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -50,6 +51,7 @@ public class CMMVM {
             Operand op1;
             Operand op2;
             Scanner sc;
+            String boolLitrl;
             switch (inst.getOpt()) {
 
                 // arithmetic
@@ -341,13 +343,37 @@ public class CMMVM {
                 // io operation
                 case Opcode.iread:
                     sc = new Scanner(System.in);
-                    iopd1 = sc.nextInt();
+                    try {
+                        iopd1 = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.err.println("Input Mismatch, Expected Integer");
+                        System.exit(-1);
+                        return;
+                    }
                     currRecd.pushOpd(new Operand(iopd1));
                     break;
                 case Opcode.dread:
                     sc = new Scanner(System.in);
-                    dopd1 = sc.nextDouble();
+                    try {
+                        dopd1 = sc.nextDouble();
+                    } catch (InputMismatchException e) {
+                        System.err.println("Input Mismatch, Expected Double");
+                        System.exit(-1);
+                        return;
+                    }
                     currRecd.pushOpd(new Operand(dopd1));
+                    break;
+                case Opcode.bread:
+                    sc = new Scanner(System.in);
+                    boolLitrl = sc.next();
+                    if(boolLitrl.equals("true")) {
+                        currRecd.pushOpd(new Operand(1));
+                    } else if(boolLitrl.equals("false")) {
+                        currRecd.pushOpd(new Operand(0));
+                    } else {
+                        System.err.println("Input Mismatch, Expected Boolean: 'true' or 'false'");
+                        System.exit(-1);
+                    }
                     break;
                 case Opcode.iwrite:
                     iopd1 = currRecd.popOpd().getIntVal();
@@ -356,6 +382,14 @@ public class CMMVM {
                 case Opcode.dwrite:
                     dopd1 = currRecd.popOpd().getDoubleVal();
                     System.out.println(dopd1);
+                    break;
+                case Opcode.bwrite:
+                    iopd1 = currRecd.popOpd().getIntVal();
+                    if(iopd1 == 1) {
+                        System.out.println("true");
+                    } else if(iopd1 == 0) {
+                        System.out.println("false");
+                    }
                     break;
                 default:
                     break;
