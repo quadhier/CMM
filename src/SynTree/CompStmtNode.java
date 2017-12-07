@@ -1,7 +1,6 @@
 package SynTree;
 
 
-import CMMVM.Bytecode;
 import CMMVM.Program;
 import Lexer.Tag;
 import SymTable.Env;

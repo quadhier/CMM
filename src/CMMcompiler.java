@@ -1,5 +1,6 @@
 import Buffer.CharBuffer;
 import Buffer.TokenBuffer;
+import CMMVM.CMMVM;
 import CMMVM.Program;
 import CMMVM.Opcode;
 import Failure.Failure;
@@ -58,6 +59,10 @@ public class CMMcompiler {
 //        }
 //        Failure.reportFailure();
 
+
+
+
+
         Parser parser = new Parser(filepath, reader);
         // get parse tree
         SNode root = parser.parse();
@@ -87,7 +92,8 @@ public class CMMcompiler {
         program.serialize();
 
         // run code on the virtual machine
-
+        CMMVM cmmvm = new CMMVM(program);
+        cmmvm.execute();
 
 
     }

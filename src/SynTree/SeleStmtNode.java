@@ -84,7 +84,9 @@ public class SeleStmtNode extends SNode {
         int codeAddr2 = program.getCodeNum();
         program.addCode(Opcode.jmp);
         int targetAddr1 = program.getCodeNum();
-        elseStatement.genBytecode(program);
+        if(elseStatement != null) {
+            elseStatement.genBytecode(program);
+        }
         int targetAddr2 = program.getCodeNum();
         program.backpatch(codeAddr1, targetAddr1);
         program.backpatch(codeAddr2, targetAddr2);

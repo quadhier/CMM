@@ -90,7 +90,7 @@ public class DeclNode extends SNode {
 				currentEnv.put(currIdt.getLexeme(), symbol);
 				// check data type of initializer
 				if (initlzrNode.getExpression() == null)
-					return;
+					continue;
 				initlzrNode.getExpression().checkAndBuild();
 				int asgnDataType = initlzrNode.getExpression().getDataType();
 				// double to int cast warning

@@ -1,32 +1,39 @@
 package CMMVM;
 
+import Lexer.Tag;
+
 public class Operand {
 
-    private int tag;
+    private int tag; // Tag.VARLEXPR or Tag.ARRLEXPR
     private int dataType;
 
     private int intVal;
-    private double doublVal;
-    //private boolean boolVal;
-    private Object arrVal;
+    private double doubleVal;
+    private int[] intArr;
+    private double[] doubleArr;
 
-    public Operand(int tag, int val) {
-        this.tag = tag;
+    public Operand(int val) {
+        this.tag = Tag.VARLEXPR;
         this.intVal = val;
+        this.dataType = Tag.INT;
     }
 
-    public Operand(int tag, double val) {
-        this.tag = tag;
-        this.doublVal = val;
+    public Operand(double val) {
+        this.tag = Tag.VARLEXPR;
+        this.doubleVal = val;
+        this.dataType = Tag.DOUBLE;
     }
 
-    public Operand(int tag, boolean val) {
-        this.tag = tag;
-        //this.boolVal = val;
+    public Operand(int[] arr) {
+        this.tag = Tag.ARRLEXPR;
+        this.intArr = arr;
+        this.dataType = Tag.INT;
     }
 
-    public int getTag() {
-        return this.tag;
+    public Operand(double[] arr) {
+        this.tag = Tag.ARRLEXPR;
+        this.doubleArr = arr;
+        this.dataType = Tag.DOUBLE;
     }
 
     public int getDataType() {
@@ -34,15 +41,28 @@ public class Operand {
     }
 
     public int getIntVal() {
-        return this.intVal;
+        if(dataType == Tag.DOUBLE) {
+            return (int)this.doubleVal;
+        } else {
+            return this.intVal;
+        }
     }
 
-    public double getDoublVal() {
-        return this.doublVal;
+    public double getDoubleVal() {
+        if(dataType == Tag.DOUBLE) {
+            return this.doubleVal;
+        } else {
+            return this.intVal;
+        }
     }
 
-//    public boolean getBoolVal() {
-//        return this.boolVal;
-//    }
+    public int[] getIntArr() {
+        return intArr;
+    }
+
+    public double[] getDoubleArr() {
+        return doubleArr;
+    }
+
 
 }

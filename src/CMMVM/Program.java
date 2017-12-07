@@ -12,6 +12,7 @@ public class Program {
     ArrayList<Object> constantPool;
     ArrayList<Bytecode> codes;
     int currentOpdIdx; // only used in code generation
+    int slotSize;
 
     // prepared for while statement
     Stack<Integer> iterAddr;
@@ -22,6 +23,7 @@ public class Program {
         constantPool = new ArrayList<>();
         codes = new ArrayList<Bytecode>();
         currentOpdIdx = 0;
+        slotSize = 0;
         iterAddr = new Stack<Integer>();
         breakCollection = new Stack<>();
     }
@@ -34,12 +36,22 @@ public class Program {
         return codes;
     }
 
+    public Bytecode getCode(int i) {
+        if(i < codes.size())
+            return codes.get(i);
+        return null;
+    }
+
     public int getCodeNum() {
         return this.codes.size();
     }
 
     public int getCurrentOpdInx() {
         return currentOpdIdx;
+    }
+
+    public int getSlotSize() {
+        return slotSize;
     }
 
     public void addCode(byte opt, int opd) {
@@ -54,6 +66,9 @@ public class Program {
 
     public void createVal() {
         currentOpdIdx++;
+        if(currentOpdIdx > slotSize) {
+            slotSize = currentOpdIdx;
+        }
     }
 
     public void removeVal() {

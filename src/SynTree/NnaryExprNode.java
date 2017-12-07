@@ -649,7 +649,7 @@ public class NnaryExprNode extends SNode {
                         } else if(currOpt.getTag() == '/') {
                             program.addCode(Opcode.idiv);
                         } else if(currOpt.getTag() == '%') {
-                            program.addCode(Opcode.ddiv);
+                            program.addCode(Opcode.rem);
                         }
                     }
                 }
