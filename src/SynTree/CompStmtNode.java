@@ -15,7 +15,6 @@ public class CompStmtNode extends SNode {
 
     private Env nextEnv;
 
-
     public CompStmtNode() {
         super(Tag.COMPSTMT);
         statements = null;
@@ -33,16 +32,19 @@ public class CompStmtNode extends SNode {
     }
 
     public void setContinueLoop(boolean continueLoop){
-        for(StmtNode stmtNode : statements) {
-            stmtNode.currentEnv.setContinueLoop(continueLoop);
-        }
+            nextEnv.setContinueLoop(continueLoop);
+    }
 
+    public void setBreakLoop(boolean breakLoop){
+        nextEnv.setBreakLoop(breakLoop);
     }
 
     @Override
     public void checkAndBuild() {
         // inside a compound statement, a new environment should be created
         nextEnv = new Env(currentEnv);
+        if (statements==null)
+            return;
         for(StmtNode stmtNode : statements) {
             stmtNode.setCurrentEnv(nextEnv);
             stmtNode.checkAndBuild();

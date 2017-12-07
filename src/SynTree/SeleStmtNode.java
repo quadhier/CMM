@@ -1,11 +1,8 @@
 package SynTree;
 
-import CMMVM.Bytecode;
 import CMMVM.Program;
 import Failure.Failure;
 import Lexer.Tag;
-
-import java.util.ArrayList;
 
 
 // selection-statement
@@ -34,9 +31,16 @@ public class SeleStmtNode extends SNode {
         this.elseStatement = elseStatement;
     }
 
+    public StmtNode getIfStatement() {
+        return ifStatement;
+    }
+
+    public StmtNode getElseStatement() {
+        return elseStatement;
+    }
+
     @Override
     public void checkAndBuild() {
-
         expression.setCurrentEnv(currentEnv);
         expression.checkAndBuild();
         if(expression.getDataType() != Tag.BOOL) {

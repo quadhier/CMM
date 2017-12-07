@@ -34,29 +34,79 @@ public class IterStmtNode extends SNode {
 			Failure.addFailure(SynTree.getFilepath(), expression.getStartLine(), expression.getStartPos(), Failure.ERROR,
 					"expected bool type expression");
 		}
-	   /* if (statement.getChild() instanceof CompStmtNode)
-            ((CompStmtNode) statement.getChild()).getNextEnv().setInLoop();*/
-		currentEnv.setInLoop(true);
-		/*if (statement.getChild().getTag() == Tag.COMPSTMT)
-			((CompStmtNode) statement.getChild()).getNextEnv().setInLoop();*/
-		statement.setCurrentEnv(currentEnv);
-		statement.checkAndBuild();
-		if (statement.getChild().getTag() == Tag.COMPSTMT)
-			currentEnv.setInLoop(false);
+		boolean alreadyInLoop = currentEnv.isInLoop();
+		if (alreadyInLoop){
+			statement.setCurrentEnv(currentEnv);
+			statement.checkAndBuild();
+		}else {
+			currentEnv.setInLoop(true);
+			statement.setCurrentEnv(currentEnv);
+			statement.checkAndBuild();
+			if (statement.getChild().getTag() == Tag.COMPSTMT)
+				currentEnv.setInLoop(false);
+			if (statement.getChild().getTag()==Tag.IF)
+				currentEnv.setInLoop(false);
+		}
 	}
 
 	@Override
 	public void visit() {
+		if (currentEnv.isContinueLoop() || currentEnv.isBreakLoop())
+			return;
 		while ((boolean) expression.getValue()) {
+			//if statement is single jumpStatement, do nothing
+			if (statement.getChild().getTag()==Tag.JUMPSTMT)
+				return;
 			statement.visit();
-			//if continues
+			//if the statement is compound statement
 			if (statement.getChild().getTag() == Tag.COMPSTMT) {
-				if (((CompStmtNode) statement.getChild()).getNextEnv().isContinueLoop())
-					((CompStmtNode) statement.getChild()).setContinueLoop(false);
-			}else if (statement.getChild().currentEnv.isContinueLoop())
-				statement.getChild().currentEnv.setContinueLoop(false);
+				//if continues
+				if (((CompStmtNode) statement.getChild()).getNextEnv().isContinueLoop()) {
+					statement.currentEnv.setContinueLoop(false); //把外层的while的isContinue值重置
+					((CompStmtNode) statement.getChild()).setContinueLoop(false); //把内层的while的isContinue值重置
+					continue;
+				}
+				//if breaks
+				if (((CompStmtNode) statement.getChild()).getNextEnv().isBreakLoop()) {
+					statement.currentEnv.setBreakLoop(false);
+					((CompStmtNode) statement.getChild()).setBreakLoop(false);
+					break;
+				}
+			}  //if the statement is a single if statement
+			else if(statement.getChild().getTag() == Tag.SELESTMT){
+				SeleStmtNode seleStmtNode = (SeleStmtNode) statement.getChild();
+				StmtNode ifStmt = seleStmtNode.getIfStatement();
+				StmtNode elseStmt = seleStmtNode.getElseStatement();
+				if (ifStmt.getChild().getTag() == Tag.COMPSTMT) {
+					//if continues
+					if (((CompStmtNode) ifStmt.getChild()).getNextEnv().isContinueLoop()) {
+						ifStmt.currentEnv.setContinueLoop(false); //把外层的while的isContinue值重置
+						((CompStmtNode) ifStmt.getChild()).setContinueLoop(false); //把内层的while的isContinue值重置
+						continue;
+					}
+					//if breaks
+					if (((CompStmtNode) ifStmt.getChild()).getNextEnv().isBreakLoop()) {
+						ifStmt.currentEnv.setBreakLoop(false);
+						((CompStmtNode) ifStmt.getChild()).setBreakLoop(false);
+						break;
+					}
+				}
+				if (elseStmt!=null && elseStmt.getChild().getTag() == Tag.COMPSTMT){
+					//if continues
+					if (((CompStmtNode) elseStmt.getChild()).getNextEnv().isContinueLoop()) {
+						elseStmt.currentEnv.setContinueLoop(false); //把外层的while的isContinue值重置
+						((CompStmtNode) elseStmt.getChild()).setContinueLoop(false); //把内层的while的isContinue值重置
+						continue;
+					}
+					//if breaks
+					if (((CompStmtNode) elseStmt.getChild()).getNextEnv().isBreakLoop()) {
+						elseStmt.currentEnv.setBreakLoop(false);
+						((CompStmtNode) elseStmt.getChild()).setBreakLoop(false);
+						break;
+					}
+				}
+			}
 		}
-
 	}
 
 	@Override
