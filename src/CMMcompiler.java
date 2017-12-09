@@ -84,13 +84,13 @@ public class CMMcompiler {
         // optimization
 
 
-        // generate code
-        Program program = synTree.genBytecode();
-        //program.serialize();
-
-        // run code on the virtual machine
-        CMMVM cmmvm = new CMMVM(program);
-        cmmvm.execute();
+//        // generate code
+//        Program program = synTree.genBytecode();
+//        program.serialize();
+//
+//        // run code on the virtual machine
+//        CMMVM cmmvm = new CMMVM(program);
+//        cmmvm.execute();
     }
 
 

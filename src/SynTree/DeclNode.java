@@ -129,11 +129,17 @@ public class DeclNode extends SNode {
 				//data type is already set in advance when doing checkAndBuild()
 				switch (symbol.getDataType()){
 					case Tag.INT:
-						symbol.setValue(new int[totalNum]);
+						symbol.setValue(new Integer[totalNum]);
+						symbol.setArrayLength(totalNum);
+						break;
 					case Tag.BOOL:
-						symbol.setValue(new boolean[totalNum]);
+						symbol.setValue(new Boolean[totalNum]);
+                        symbol.setArrayLength(totalNum);
+                        break;
 					case Tag.DOUBLE:
-						symbol.setValue(new double[totalNum]);
+						symbol.setValue(new Double[totalNum]);
+                        symbol.setArrayLength(totalNum);
+                        break;
 				}
 			}else if (tag == Tag.VARDECL){
 				//initlzrNode.getExpression().visit();  //for debugging use,visit first so you can learn the values of expressions

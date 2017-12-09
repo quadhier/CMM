@@ -1,6 +1,5 @@
 package SynTree;
 
-import CMMVM.Bytecode;
 import CMMVM.Opcode;
 import CMMVM.Program;
 import Failure.Failure;
@@ -8,9 +7,8 @@ import Lexer.Identifer;
 import Lexer.Tag;
 import Lexer.Token;
 import SymTable.Symbol;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode;
-
 import java.util.ArrayList;
+
 
 public class NnaryExprNode extends SNode {
 
@@ -108,7 +106,12 @@ public class NnaryExprNode extends SNode {
 				for (int j = i + 1; j < dimension; j++)
 					tmpDimLength *= (int) dimLengths.get(j).getValue();
 				location += tmpDimLength;
-			}
+            }
+			// to do: array out of bound check
+            if(symbol.getArrayLength() <= location) {
+			    System.err.println("Array Out Of Bound");
+			    System.exit(-1);
+            }
 			array[location] = value;
 		}
 		this.value = value;
@@ -287,7 +290,7 @@ public class NnaryExprNode extends SNode {
 				case Tag.INT:
 					value = Integer.valueOf(s);
 					break;
-				case Tag.DCONST:
+				case Tag.DOUBLE:
 					value = Double.valueOf(s);
 					break;
 				case Tag.BOOL:
@@ -315,9 +318,12 @@ public class NnaryExprNode extends SNode {
 			}
 			value = array[location];
 		} else if (tag == Tag.ADTVEXPR || tag == Tag.MLTVEXPR || tag == Tag.UNARYEXPR) { //when is not left value, calculate the value.
+            // compulsory type casting is not allowed
+            // when the type of child expression is unknown
 			int i = 0;
 			double d = 0;
 			boolean b = false;
+			// type is known
 			if (tag == Tag.UNARYEXPR) {
 				switch (dataType) {
 					case Tag.INT:
@@ -333,8 +339,10 @@ public class NnaryExprNode extends SNode {
 						value = !b;
 						break;
 				}
+			// type is unknown
 			} else if (tag == Tag.ADTVEXPR) {
 				switch (dataType) {
+				    // type is known
 					case Tag.INT:
 						i = (int) childExpressions.get(0).getValue();
 						for (int m = 1; m < childExpressions.size(); m++) {
@@ -351,11 +359,23 @@ public class NnaryExprNode extends SNode {
 						}
 						value = i;
 						break;
+                    // type is unknown
 					case Tag.DOUBLE:
-						d = (double) childExpressions.get(0).getValue();
+					    // decide the type
+					    if(childExpressions.get(0).getDataType() == Tag.INT) {
+                            d = (int) childExpressions.get(0).getValue();
+                        } else {
+					        d = (double) childExpressions.get(0).getValue();
+                        }
 						for (int m = 1; m < childExpressions.size(); m++) {
 							NnaryExprNode tmp = childExpressions.get(m);
-							double tmpValue = (double) tmp.getValue();
+                            double tmpValue;
+                            // decide the type
+							if(tmp.getDataType() == Tag.INT) {
+                                tmpValue = (int) tmp.getValue();
+                            } else {
+                                tmpValue = (double) tmp.getValue();
+                            }
 							switch (tmp.getOpt().getTag()) {
 								case '+':
 									d += tmpValue;
@@ -370,6 +390,7 @@ public class NnaryExprNode extends SNode {
 				}
 			} else if (tag == Tag.MLTVEXPR) {
 				switch (dataType) {
+				    // type is known
 					case Tag.INT:
 						i = (int) childExpressions.get(0).getValue();
 						for (int m = 1; m < childExpressions.size(); m++) {
@@ -397,11 +418,23 @@ public class NnaryExprNode extends SNode {
 						}
 						value = i;
 						break;
+					// type is known
 					case Tag.DOUBLE:
-						d = (double) childExpressions.get(0).getValue();
+                        // decide the type
+                        if(childExpressions.get(0).getDataType() == Tag.INT) {
+                            d = (int) childExpressions.get(0).getValue();
+                        } else {
+                            d = (double) childExpressions.get(0).getValue();
+                        }
 						for (int m = 1; m < childExpressions.size(); m++) {
 							NnaryExprNode tmp = childExpressions.get(m);
-							double tmpValue = (double) tmp.getValue();
+							double tmpValue;
+                            // decide the type
+                            if(tmp.getDataType() == Tag.INT) {
+                                tmpValue = (int) tmp.getValue();
+                            } else {
+                                tmpValue = (double) tmp.getValue();
+                            }
 							switch (tmp.getOpt().getTag()) {
 								case '*':
 									d *= tmpValue;
@@ -420,64 +453,49 @@ public class NnaryExprNode extends SNode {
 				}
 			}
 		} else if (tag == Tag.RELAEXPR) {
-			boolean boolValue = false;
-			int i;
-			double d;
-			switch (childExpressions.get(0).getDataType()){
-				case Tag.INT:
-					i = (int) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++){
-						NnaryExprNode tmp = childExpressions.get(m);
-						int tmpValue = (int) tmp.getValue();
-						switch (tmp.getOpt().getTag()) {
-							case '>':
-								boolValue = i > tmpValue;
-								break;
-							case '<':
-								boolValue = i < tmpValue;
-								break;
-							case Tag.LE:
-								boolValue = i <= tmpValue;
-								break;
-							case Tag.GE:
-								boolValue = i >= tmpValue;
-								break;
-						}
-					}
-					break;
-				case Tag.DOUBLE:
-					d = (double) childExpressions.get(0).getValue();
-					for (int m = 1; m < childExpressions.size(); m++) {
-						NnaryExprNode tmp = childExpressions.get(m);
-						double tmpValue = (double) tmp.getValue();
-						switch (tmp.getOpt().getTag()) {
-							case '>':
-								boolValue = d > tmpValue;
-								break;
-							case '<':
-								boolValue = d < tmpValue;
-								break;
-							case Tag.LE:
-								boolValue = d <= tmpValue;
-								break;
-							case Tag.GE:
-								boolValue = d >= tmpValue;
-								break;
-						}
-					}
-					break;
-			}
-			value = boolValue;
-			//TODO assignment-operator，%=，,+=，boolean运算，2==3!=true
-			//==,!=,
-		} else if (tag == Tag.EQEXPR) {
+            boolean boolValue = false;
+            int i;
+            double d;
+
+            if (childExpressions.get(0).getDataType() == Tag.INT) {
+                i = (int) childExpressions.get(0).getValue();
+            } else {
+                i = (int) (double) childExpressions.get(0).getValue();
+            }
+            for (int m = 1; m < childExpressions.size(); m++) {
+                NnaryExprNode tmp = childExpressions.get(m);
+                int tmpValue;
+                if (tmp.getDataType() == Tag.INT) {
+                    tmpValue = (int) childExpressions.get(m).getValue();
+                } else {
+                    tmpValue = (int) (double) childExpressions.get(m).getValue();
+                }
+                switch (tmp.getOpt().getTag()) {
+                    case '>':
+                        boolValue = i > tmpValue;
+                        break;
+                    case '<':
+                        boolValue = i < tmpValue;
+                        break;
+                    case Tag.LE:
+                        boolValue = i <= tmpValue;
+                        break;
+                    case Tag.GE:
+                        boolValue = i >= tmpValue;
+                        break;
+                }
+            }
+
+            value = boolValue;
+            // TODO assignment-operator，%=，,+=，boolean运算，2==3!=true
+            //==,!=,
+        } else if (tag == Tag.EQEXPR) {
 			boolean boolValue = false, bool2;
 			int i, i1;
 			double d, d1;
 			//in case that the first expression is 2==3 == true, in this case the grammar is correct. Otherwise, the operands will all by type of bool
 			// 2==3 == true correct
 			// true != 2==3 incorrect
-
 			for (int m = 0; m < childExpressions.size(); m++) {
 				if (m == 0) {
 					switch (childExpressions.get(0).getDataType()) {

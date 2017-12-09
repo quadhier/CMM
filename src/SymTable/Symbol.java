@@ -14,6 +14,7 @@ public class Symbol {
     private int dataType; // data type: int, double, bool
     private ArrayList<NnaryExprNode> dimLengths; // length of each dimension
     private Object value; // reference to the array
+    private int arrayLength;
     private int opdIdx;
     
     // for basic data type
@@ -23,7 +24,7 @@ public class Symbol {
         this.dataType = dataType;
         this.dimLengths = null;
         this.value = null;
-
+        this.arrayLength = -1;
     }
     // for array
     public Symbol(Identifer idt, int tag, int dataType, ArrayList<NnaryExprNode> dimLengths) {
@@ -32,7 +33,7 @@ public class Symbol {
         this.dataType = dataType;
         this.dimLengths = dimLengths;
         this.value = null;
-
+        this.arrayLength = -1;
     }
 
     public Identifer getIdentifer() {
@@ -59,6 +60,10 @@ public class Symbol {
         return dimLengths;
     }
 
+    public int getArrayLength() {
+        return arrayLength;
+    }
+
     public Object getValue() {
         return value;
     }
@@ -67,15 +72,15 @@ public class Symbol {
         return opdIdx;
     }
 
-    public void setDimLengths(ArrayList<NnaryExprNode> dimLengths) {
-        this.dimLengths = dimLengths;
-    }
-
     public void setValue(Object value) {
         this.value = value;
     }
 
     public void setOpdIdx(int opdIdx) {
         this.opdIdx = opdIdx;
+    }
+
+    public void setArrayLength(int arrayLength) {
+        this.arrayLength = arrayLength;
     }
 }
