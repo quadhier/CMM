@@ -107,12 +107,30 @@ public class NnaryExprNode extends SNode {
 					tmpDimLength *= (int) dimLengths.get(j).getValue();
 				location += tmpDimLength;
             }
-			// to do: array out of bound check
-            if(symbol.getArrayLength() <= location) {
-			    System.err.println("Array Out Of Bound");
+			// to do: array invalid index and out of bound check
+            if(location < 0) {
+                System.err.println("Runtime Error: Invalid Array Index on line " + startLine + ", position " + startPos);
+                System.exit(-1);
+            } else if(symbol.getArrayLength() <= location) {
+			    System.err.println("Runtime Error: Array Out Of Bound on line " + startLine + ", position " + startPos);
 			    System.exit(-1);
             }
-			array[location] = value;
+            if(dataType == Tag.INT) {
+                try {
+                    array[location] = value;
+                } catch (Exception e) {
+                    array[location] = (int) (double) value;
+                }
+            } else if (dataType == Tag.DOUBLE){
+                try {
+                    array[location] = value;
+                } catch (Exception e) {
+                    array[location] = (double) (int) value;
+                }
+            } else {
+                array[location] = value;
+            }
+
 		}
 		this.value = value;
 	}
@@ -299,7 +317,7 @@ public class NnaryExprNode extends SNode {
 			}
 		} else if (tag == Tag.VARLEXPR) {
 			Symbol symbol = currentEnv.get(identifier.getLexeme());
-			value = symbol.getValue();
+            value = symbol.getValue();
 		} else if (tag == Tag.ARRLEXPR) {
 			Symbol symbol = currentEnv.get(identifier.getLexeme());
 			int dimension = symbol.getDimension();
@@ -317,6 +335,11 @@ public class NnaryExprNode extends SNode {
 				location += tmpDimLength;
 			}
 			value = array[location];
+			if(dataType == Tag.BOOL && value == null) {
+                value = false;
+            } else if(value == null) {
+                value = 0;
+            }
 		} else if (tag == Tag.ADTVEXPR || tag == Tag.MLTVEXPR || tag == Tag.UNARYEXPR) { //when is not left value, calculate the value.
             // compulsory type casting is not allowed
             // when the type of child expression is unknown
@@ -501,7 +524,11 @@ public class NnaryExprNode extends SNode {
 					switch (childExpressions.get(0).getDataType()) {
 						case Tag.INT:
 							i = (int) childExpressions.get(0).getValue();
-							i1 = (int) childExpressions.get(1).getValue();
+							if(childExpressions.get(1).getDataType() == Tag.INT) {
+                                i1 = (int) childExpressions.get(1).getValue();
+                            } else {
+							    i1 = (int) (double) childExpressions.get(1).getValue();
+                            }
 							switch (childExpressions.get(1).getOpt().getTag()) {
 								case Tag.EQ:
 									boolValue = i == i1;
@@ -513,7 +540,11 @@ public class NnaryExprNode extends SNode {
 							break;
 						case Tag.DOUBLE:
 							d = (double) childExpressions.get(0).getValue();
-							d1 = (double) childExpressions.get(1).getValue();
+                            if(childExpressions.get(1).getDataType() == Tag.INT) {
+                                d1 = (double) (int) childExpressions.get(1).getValue();
+                            } else {
+                                d1 = (double) childExpressions.get(1).getValue();
+                            }
 							switch (childExpressions.get(1).getOpt().getTag()) {
 								case Tag.EQ:
 									boolValue = d == d1;

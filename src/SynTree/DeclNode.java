@@ -132,12 +132,12 @@ public class DeclNode extends SNode {
 						symbol.setValue(new Integer[totalNum]);
 						symbol.setArrayLength(totalNum);
 						break;
-					case Tag.BOOL:
-						symbol.setValue(new Boolean[totalNum]);
+					case Tag.DOUBLE:
+                        symbol.setValue(new Double[totalNum]);
                         symbol.setArrayLength(totalNum);
                         break;
-					case Tag.DOUBLE:
-						symbol.setValue(new Double[totalNum]);
+					case Tag.BOOL:
+						symbol.setValue(new Boolean[totalNum]);
                         symbol.setArrayLength(totalNum);
                         break;
 				}

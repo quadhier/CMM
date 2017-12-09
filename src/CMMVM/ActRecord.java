@@ -32,7 +32,7 @@ public class ActRecord {
 
     public int storeLocalArrEle(int arrIdx, int eleIdx, int val) {
         int[] iarr = localVariables[arrIdx].getIntArr();
-        if(eleIdx < iarr.length) {
+        if(eleIdx >= 0 && eleIdx < iarr.length) {
             iarr[eleIdx] = val;
             return 0;
         } else {
@@ -42,7 +42,7 @@ public class ActRecord {
 
     public int storeLocalArrEle(int arrIdx, int eleIdx, double val) {
         double[] darr = localVariables[arrIdx].getDoubleArr();
-        if(eleIdx < darr.length) {
+        if(eleIdx >= 0 && eleIdx < darr.length) {
             darr[eleIdx] = val;
             return 0;
         } else {

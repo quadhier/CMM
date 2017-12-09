@@ -88,7 +88,14 @@ public class AsgmStmtNode extends SNode {
 			case Tag.INT:
 				switch (assignmentOperator.getTag()) {
 					case '=':
-						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+					    // type should be decided here
+                        if(expression.getDataType() == Tag.DOUBLE) {
+                            leftValueExpression.setValue((int)(double)expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+                        } else if(expression.getDataType() == Tag.INT) {
+                            leftValueExpression.setValue(expression.getValue());
+                        } else {
+                            leftValueExpression.setValue(expression.getValue());
+                        }
 						break;
 					case Tag.PLASN:
 						leftValueExpression.setValue((int) leftValueExpression.getValue() + (int) expression.getValue());
@@ -117,10 +124,16 @@ public class AsgmStmtNode extends SNode {
 				break;
 			case Tag.DOUBLE:
 				switch (assignmentOperator.getTag()) {
-
                     case '=':
-						leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
-						break;
+                        // type should be decided here
+                        if(expression.getDataType() == Tag.DOUBLE) {
+                            leftValueExpression.setValue(expression.getValue()); //synchronization in the symbol table is completed inside the setValue() function
+                        } else if(expression.getDataType() == Tag.INT) {
+                            leftValueExpression.setValue((double)(int)expression.getValue());
+                        } else {
+                            leftValueExpression.setValue(expression.getValue());
+                        }
+                        break;
 					case Tag.PLASN:
 						leftValueExpression.setValue((double) (int) leftValueExpression.getValue() + (double) (int) expression.getValue());
 						break;

@@ -181,7 +181,7 @@ public class CMMVM {
                     slotIdx = currRecd.popOpd().getIntVal();
                     eleIdx = currRecd.popOpd().getIntVal();
                     if(currRecd.storeLocalArrEle(slotIdx, eleIdx, iopd1) == -1) {
-                        System.err.println("Array Out Of Bound");
+                        System.err.println("Array Index Out Of Bound");
                         System.exit(-1);
                     }
                     break;
@@ -190,7 +190,7 @@ public class CMMVM {
                     slotIdx = currRecd.popOpd().getIntVal();
                     eleIdx = currRecd.popOpd().getIntVal();
                     if(currRecd.storeLocalArrEle(slotIdx, eleIdx, dopd1) == -1) {
-                        System.err.println("Array Out Of Bound");
+                        System.err.println("Array Index Out Of Bound");
                         System.exit(-1);
                     }
                     break;
