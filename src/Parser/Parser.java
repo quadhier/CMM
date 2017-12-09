@@ -189,7 +189,9 @@ public class Parser {
                         Failure.addFailure(filepath, peek(0).getLine(), peek(0).getEndpos() + 1, Failure.ERROR, "expected identifer");
                         return null;
                     } else if(t.getTag() == Tag.IDT) {
-                        break;
+                        // drop this declaration
+                        // break;
+                        extract(1);
                     } else if(Tag.isTypeKeyword(t.getTag()) || t.getTag() == '{'
                             || t.getTag() == Tag.IF || t.getTag() == Tag.WHILE
                             || t.getTag() == Tag.BREAK || t.getTag() == Tag.CONTINUE

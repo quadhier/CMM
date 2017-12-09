@@ -11,8 +11,4 @@ public class TAC {
     TAC prev;
     TAC next;
 
-
-
-
-
 }

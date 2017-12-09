@@ -2,7 +2,6 @@ import Buffer.CharBuffer;
 import Buffer.TokenBuffer;
 import CMMVM.CMMVM;
 import CMMVM.Program;
-import CMMVM.Opcode;
 import Failure.Failure;
 import Lexer.*;
 import Parser.Parser;
@@ -19,7 +18,7 @@ public class CMMcompiler {
     public static void main(String[] args) {
 
         String filepath;
-        filepath = "test_cases/test.cmm";
+        filepath = "src/test.cmm";
 //        filepath = "test_cases/test1_变量声明.cmm";
 //        filepath = "test_cases/test2_一般变量赋值.cmm";
 //        filepath = "test_cases/test3_数组.cmm";
@@ -87,7 +86,7 @@ public class CMMcompiler {
             return;
         }
 
-        //synTree.traverse(0);
+        synTree.traverse(0);
         //synTree.visit();
 
         // build CFG

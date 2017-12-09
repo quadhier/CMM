@@ -32,12 +32,18 @@ public class IterStmtNode extends SNode {
 	@Override
 	public void checkAndBuild() {
 
+        if(expression == null)
+            return;
+
 		expression.setCurrentEnv(currentEnv);
 		expression.checkAndBuild();
 		if (expression.getDataType() != Tag.BOOL) {
 			Failure.addFailure(SynTree.getFilepath(), expression.getStartLine(), expression.getStartPos(), Failure.ERROR,
 					"expected bool type expression");
 		}
+		// infinite loop allowed
+		if(statement == null)
+			return;
 		boolean alreadyInLoop = currentEnv.isInLoop();
 		if (alreadyInLoop){
 			statement.setCurrentEnv(currentEnv);
@@ -125,7 +131,8 @@ public class IterStmtNode extends SNode {
         }
         System.out.println("IterStmt");
         expression.traverse(blank + 1);
-        statement.traverse(blank + 1);
+        if(statement != null)
+        	statement.traverse(blank + 1);
     }
 
 
@@ -139,7 +146,8 @@ public class IterStmtNode extends SNode {
         expression.genBytecode(program);
         int codeAddr = program.getCodeNum();
         program.addCode(Opcode.bez);
-        statement.genBytecode(program);
+        if(statement != null)
+        	statement.genBytecode(program);
         program.addCode(Opcode.jmp, targetAddr1);
         int targetAddr2 = program.getCodeNum();
         program.backpatch(codeAddr, targetAddr2);
