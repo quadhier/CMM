@@ -1,8 +1,10 @@
 package CMMVM;
 import CFG.TAC;
 
+import java.io.Serializable;
 
-public class Bytecode {
+
+public class Bytecode implements Serializable {
 
     private int offset;
 

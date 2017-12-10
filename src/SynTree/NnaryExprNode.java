@@ -340,6 +340,15 @@ public class NnaryExprNode extends SNode {
 					tmpDimLength *= (int) dimLengths.get(j).getValue();
 				location += tmpDimLength;
 			}
+
+            if(location < 0) {
+                System.err.println("Runtime Error: Invalid Array Index on line " + startLine + ", position " + startPos);
+                System.exit(-1);
+            } else if(symbol.getArrayLength() <= location) {
+                System.err.println("Runtime Error: Array Out Of Bound on line " + startLine + ", position " + startPos);
+                System.exit(-1);
+            }
+
 			value = array[location];
 			if(dataType == Tag.BOOL && value == null) {
                 value = false;

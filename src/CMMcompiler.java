@@ -7,12 +7,32 @@ import Lexer.*;
 import Parser.Parser;
 import SynTree.SNode;
 import SynTree.SynTree;
+import javafx.scene.Parent;
 
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Field;
 
 public class CMMcompiler {
+
+    private static FileReader getReader(String filepath) {
+
+        FileReader reader = null;
+        try {
+            reader = new FileReader(filepath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                if(reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e1) {
+                e.printStackTrace();
+            }
+
+        }
+        return reader;
+    }
 
 
     public static void main(String[] args) {
@@ -31,20 +51,9 @@ public class CMMcompiler {
 //        filepath = "src/test_semantic_errors.cmm";
 //        filepath = args[0];
 
-        FileReader reader = null;
-        try {
-            reader = new FileReader(filepath);
-        } catch (IOException e) {
-            e.printStackTrace();
-            try {
-                if(reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e1) {
-                e.printStackTrace();
-            }
-
-        }
+        FileReader reader = getReader(filepath);
+        if(reader == null)
+            return;
 
 //        CharBuffer cbuffer = new CharBuffer(reader, 10);
 //        while(cbuffer.peek(1) != 0) {
@@ -91,9 +100,7 @@ public class CMMcompiler {
 
         // build CFG
 
-
         // optimization
-
 
         // generate code
         Program program = synTree.genBytecode();
@@ -102,6 +109,145 @@ public class CMMcompiler {
         // run code on the virtual machine
         CMMVM cmmvm = new CMMVM(program);
         cmmvm.execute();
+    }
+
+    public static String getFileName(String filepath) {
+        int slashIdx = filepath.lastIndexOf('/');
+        if(slashIdx >= 0) {
+            filepath = filepath.substring(slashIdx, filepath.length() - 1);
+        }
+        int dotIdx = filepath.lastIndexOf('.');
+        if(dotIdx > 0) {
+            filepath = filepath.substring(0, dotIdx);
+        }
+        return filepath;
+    }
+
+    public static void printTree(String filepath) {
+        FileReader reader = getReader(filepath);
+        if(reader == null)
+            return;
+        Parser parser = new Parser(filepath, reader);
+        SynTree synTree = new SynTree(parser.parse(), filepath);
+        synTree.checkAndBuild();
+        Failure.reportFailure();
+        if (!Failure.canContinue()) {
+            return;
+        }
+        synTree.traverse(0);
+    }
+
+    public static void compile(String filepath) {
+        FileReader reader = getReader(filepath);
+        if (reader == null)
+            return;
+        Parser parser = new Parser(filepath, reader);
+        SynTree synTree = new SynTree(parser.parse(), filepath);
+        synTree.checkAndBuild();
+        Failure.reportFailure();
+        if (!Failure.canContinue()) {
+            return;
+        }
+        Program program = synTree.genBytecode();
+        FileOutputStream fout = null;
+        ObjectOutputStream oos = null;
+        try {
+            File file = new File(getFileName(filepath) + ".cmmbyte");
+            fout = new FileOutputStream(file);
+            oos = new ObjectOutputStream(fout);
+            oos.writeObject(program);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fout != null) {
+                    fout.close();
+                }
+                if(oos != null) {
+                    oos.close();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+        }
+    }
+
+    public static void view(String filepath) {
+        FileReader reader = getReader(filepath);
+        if (reader == null)
+            return;
+        FileInputStream fin = null;
+        ObjectInputStream ois = null;
+        Program program = null;
+        try {
+            fin = new FileInputStream(filepath);
+            ois = new ObjectInputStream(fin);
+            program = (Program) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fin != null) {
+                    fin.close();
+                }
+                if(ois != null) {
+                    ois.close();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        if(program != null) {
+            System.out.println(program.toString());
+        }
+    }
+
+    public static void execute(String filepath) {
+        FileReader reader = getReader(filepath);
+        if (reader == null)
+            return;
+        FileInputStream fin = null;
+        ObjectInputStream ois = null;
+        Program program = null;
+        try {
+            fin = new FileInputStream(filepath);
+            ois = new ObjectInputStream(fin);
+            program = (Program) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fin != null) {
+                    fin.close();
+                }
+                if(ois != null) {
+                    ois.close();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        if(program != null) {
+            CMMVM cmmvm = new CMMVM(program);
+            cmmvm.execute();
+        }
+
+    }
+
+    public static void interpret(String filepath) {
+        FileReader reader = getReader(filepath);
+        if (reader == null)
+            return;
+        Parser parser = new Parser(filepath, reader);
+        SynTree synTree = new SynTree(parser.parse(), filepath);
+        synTree.checkAndBuild();
+        Failure.reportFailure();
+        if (!Failure.canContinue()) {
+            return;
+        }
+        synTree.visit();
+
     }
 
 

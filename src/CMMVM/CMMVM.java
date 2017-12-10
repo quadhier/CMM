@@ -141,7 +141,7 @@ public class CMMVM {
                     slotIdx = currRecd.popOpd().getIntVal();
                     eleIdx = currRecd.popOpd().getIntVal();
                     iarr = currRecd.getLocalVal(slotIdx).getIntArr();
-                    if(eleIdx >= iarr.length) {
+                    if(eleIdx < 0 || eleIdx >= iarr.length) {
                         System.err.println("Array Out Of Bound");
                         System.exit(-1);
                     }
@@ -151,7 +151,7 @@ public class CMMVM {
                     slotIdx = currRecd.popOpd().getIntVal();
                     eleIdx = currRecd.popOpd().getIntVal();
                     darr = currRecd.getLocalVal(slotIdx).getDoubleArr();
-                    if(eleIdx >= darr.length) {
+                    if(eleIdx < 0 || eleIdx >= darr.length) {
                         System.err.println("Array Out Of Bound");
                         System.exit(-1);
                     }
