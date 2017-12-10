@@ -1,3 +1,71 @@
-int a;
-a = 10;
-write(a);
+// narrowly cast warning in declaration
+int a = 2.1;
+
+// illegal conversion in declaration
+double b = true;
+bool c = 2;
+bool d = 3.3;
+
+// non-integer array size in declaration
+// initialization of array
+int[2][3.4] e = 0;
+
+//redefinition
+double a = 0;
+
+// narrowly cast warning in assignment
+a = 3.2;
+
+// illegal conversion in assignment
+a = true;
+b = false;
+
+// illegal data type of expression in iteration-statement
+while(a) {
+    write(a);
+}
+
+// not in loop
+if(a == 1) {
+    break;
+    continue;
+} else {
+    while(true) {
+        if(a > 0) {
+            break;
+            continue;
+        }
+
+    }
+}
+
+// not declared
+a = b + f;
+
+// inconsistent declaration and access data type
+a[12] = 1;
+e = 3;
+
+// inconsistent dimensions
+int[2][3] arr;
+arr[2] = 10;
+
+// non-integer array size in left-value-expression
+e[2][3.3] = 1;
+
+
+// operator cannot be applied
+c  = !(323+32);
+c = !21;
+c = true + true * 23;
+c = 23 == true;
+b = b % 23.0;
+c = true || 4;
+c = c && 3 ;
+c = c && c || c;
+
+// illegal data type of expression in selection-statement
+if(a)
+{
+    a += 1;
+}

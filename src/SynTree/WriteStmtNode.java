@@ -1,11 +1,9 @@
 package SynTree;
 
-import CMMVM.Bytecode;
 import CMMVM.Opcode;
 import CMMVM.Program;
 import Lexer.Tag;
 
-import java.util.ArrayList;
 
 public class WriteStmtNode extends SNode {
 

@@ -188,6 +188,12 @@ public class NnaryExprNode extends SNode {
 				endLine = identifier.getLine();
 				endPos = identifier.getEndpos();
 			} else {
+			    // check if dimension is consistent
+                if(childExpressions.size() != symbol.getDimension()) {
+                    Failure.addFailure(SynTree.getFilepath(), identifier.getLine(), identifier.getStartpos(), Failure.ERROR,
+                            "the dimension of array '" + identifier.getLexeme() + "' when it is accessed is conflict with its definition");
+                }
+
 				for (NnaryExprNode nnaryExprNode : childExpressions) {
 					nnaryExprNode.setCurrentEnv(currentEnv);
 					nnaryExprNode.checkAndBuild();
