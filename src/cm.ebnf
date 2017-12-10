@@ -1,15 +1,23 @@
+<program> = { <global-declaration> | <function-definition>} ;
 
-<program> = <statement> { <statement> } ;
+<function-definition> =
+( "void" | "int" | "double" | "bool" ) <identifier> "(" [ <parameter-list> ] ")" "{" { <statement> } "}"
+
+<parameter-list> = <constant-declaration-specifier> <identifier> { "," <constant-declaration-specifier> <identifier> }
 
 <statement> = <declaration>
 | <compound-statement>
 | <assignment-statement>
 | <selection-statement>
 | <iteration-statement>
-| <jump-statement> 
+| <jump-statement>
 | <read-statement>
 | <write-statement> ;
 
+<global-declaration> =
+<constant-declaration-specifier> <identifier> [ "=" <constant> ] { "," <identifier> [ "=" <constant> ] } ";" ;
+
+<constant-declaration-specifier> = ( "int" | "double" | "bool" ) { "[" <integer-constant> "]" }
 
 <declaration> = <declaration-specifier> <initializer> { "," <initializer> } ";" ;
 
@@ -29,6 +37,7 @@
 
 <jump-statement> = "continue" ";"
 | "break" ";"
+| "return" [ <expression> ] ";"
 
 <read-statement> = "read" "(" <left-value-expression> ")"
 
@@ -39,10 +48,10 @@
 
 <expression> = <logical-OR-expression> ;
 
-<logical-OR-expression> = <logical-AND-expression> 
+<logical-OR-expression> = <logical-AND-expression>
 | <logical-OR-expression> "||" <logical-AND-expression> ;
 
-<logical-AND-expression> = <equality-expression> 
+<logical-AND-expression> = <equality-expression>
 | <logical-AND-expression> "&&" <equality-expression> ;
 
 <equality-expression> = <relational-expression>
@@ -59,7 +68,7 @@
 | <additive-expression> "+" <multiplicative-expression>
 | <additive-expression> "-" <multiplicatvie-expression> ;
 
-<multiplicatvie-expression> = <unary-expression> 
+<multiplicatvie-expression> = <unary-expression>
 | <multiplicative-expression> "*" <unary-expression>
 | <multiplicative-expression> "/" <unary-expression>
 | <multiplicative-expression> "%" <unary-expression> ;
@@ -69,10 +78,13 @@
 <unary-operator> = "-" | "!" ;
 
 <primary-expression> = <left-value-expression>
+| <function-invokation>
 | <constant>
 | "(" <expression> ")" ;
 
 <left-value-expression> = <identifier> { "[" <additive-expression> "]" }
+
+<function-invokation> = <identifier> "(" { <expression> } ")"
 
 <constant> = <integer-constant>
 | <floating-constant>
